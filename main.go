@@ -18,7 +18,9 @@ func main() {
 
 	// ... any extra endpoints will be set up here
 	if os.Getenv("LOCAL") == "1" {
-		r.Get("/", handleRoot) // this endpoint is written within for testing purposes
+		r.Get("/", handleRootLocal) // this endpoint is written within for testing purposes
+	} else {
+		r.Get("/", handleRootProd) // this endpoint is what will be seen within the production environemnt
 	}
 
 	// set up logic for case where there will be an empty return
@@ -38,6 +40,12 @@ func main() {
 	http.ListenAndServe(":8080", r)
 }
 
-func handleRoot(rw http.ResponseWriter, req *http.Request) {
+func handleRootLocal(rw http.ResponseWriter, req *http.Request) {
 	rw.Write([]byte("The main server is alive an able to catch the ping"))
+	return
+}
+
+func handleRootProd(rw http.ResponseWriter, req *http.Request) {
+	rw.Write([]byte("Enter /suggestions?q=<<CITYNAMEHERE>> to get started"))
+	return
 }
