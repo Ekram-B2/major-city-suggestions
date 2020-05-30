@@ -25,10 +25,16 @@ func HandleRequestForSuggestions(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	// 2. Apply the search term in order to render the list of cities that can possibly be suggestions
-	relevantLargeCities := datastore.GetAllRelevantCities(searchTerm)
+	dataStateWithRelevantCities, err := datastore.GetAllRelevantCities(searchTerm)
+	if err != nil {
+		// This is a serious error with how the architecture is meant to be managed and
+		// therefore, we can't recover from this
+		http.Error(rw, "There was an error determining the suggestions", http.StatusInternalServerError)
+		return
+	}
 
 	// 3. Given the relevant cities, transform them into suggestions - i.e, the form that we want to return them
-	suggestionsForSearchTerm := getSuggestionsForSearchTerm(relevantLargeCities, searchTerm)
+	suggestionsForSearchTerm := getSuggestionsForSearchTerm(dataStateWithRelevantCities, searchTerm)
 
 	// 4. Set up the response format to be returned back to the caller
 	responseContent := responseFormat{suggestions: suggestionsForSearchTerm}
@@ -36,7 +42,7 @@ func HandleRequestForSuggestions(rw http.ResponseWriter, req *http.Request) {
 	// 5. Set up the response object within content to be returned back to the user
 	rw.Header().Add("Content-Type", "application/json; charset=UTF-8")
 	b := &bytes.Buffer{}
-	err := json.NewEncoder(b).Encode(responseContent)
+	err = json.NewEncoder(b).Encode(responseContent)
 	if err != nil {
 		http.Error(rw, "There was an error marshalling to the expected output", http.StatusInternalServerError)
 		return
