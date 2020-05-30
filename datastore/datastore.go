@@ -26,9 +26,8 @@ type DataState struct {
 }
 
 // GetAllRelevantCities is the interface used to access all relevant search terms
-// The data state is a pointer because it makes sense in the logic to use nil to be
-// representative of an empty value. A empty literal return for the data state in this
-// case simply means that there are no relevant cities to the search query
+// A data state is returned as a pointer to because it is possible for the state to
+// have no relevant entries given the search term.
 func GetAllRelevantCities(searchTerm string) (*DataState, error) {
 
 	// 1. Retreive loaded datastate
