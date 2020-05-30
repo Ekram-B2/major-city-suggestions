@@ -47,7 +47,8 @@ func GetAllRelevantCities(searchTerm string) (*DataState, error) {
 }
 
 // getAllCities is an unexported private function whose purpose is load in a representation
-// of the entire data state in the form of a go structure.
+// of the entire data state in the form of a go structure. This function loads from a file
+// and doesn't do any batch processing
 func getAllCities() (*DataState, error) {
 	// 0. Create container to store large cities
 
