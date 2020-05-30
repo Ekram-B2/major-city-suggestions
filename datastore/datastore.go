@@ -1,36 +1,104 @@
 package datastore
 
-import "os"
+import (
+	"encoding/json"
+	"io/ioutil"
+	"os"
+	"strings"
+)
 
 // LargeCity is the structure that enacts as interface to access APIs
 type LargeCity struct {
-	name      string
-	latitude  float32
-	longitude float32
+	City             string `json:"city"`
+	Admin            string `json:"admin"`
+	Country          string `json:"country"`
+	PopulationProper string `json:"population_proper"`
+	ISO2             string `json:"iso2"`
+	Capital          string `json:"capital"`
+	Lat              string `json:"lat"`
+	Lng              string `json:"lng"`
+	Population       string `json:"population"`
 }
 
-// GetAllRelevantCities is the interface used to access all the search terms stored within the flat file
-func GetAllRelevantCities(searchTerm string) []LargeCity {
-	return []LargeCity{}
+// DataState is the structure that represents the underlying state of the system
+type DataState struct {
+	Cities []LargeCity `json:"cities"`
 }
 
-func populateAllCities(searchTerm string) ([]LargeCity, error) {
-	// 0. Create wrapper to store large cities
-	var largeCities []LargeCity
+// GetAllRelevantCities is the interface used to access all relevant search terms
+// The data state is a pointer because it makes sense in the logic to use nil to be
+// representative of an empty value. A empty literal return for the data state in this
+// case simply means that there are no relevant cities to the search query
+func GetAllRelevantCities(searchTerm string) (*DataState, error) {
+
+	// 1. Retreive loaded datastate
+	dataState, err := getAllCities()
+	if err != nil {
+		// This is a serious error since this means that we are unable to get
+		// to the point where the search term is applied onto the suggestions
+		return nil, err
+	}
+
+	// 2. Filter away irrelevant items from the DataState
+	dataState = filterForRelevantCities(dataState, searchTerm)
+
+	// 3. return the new datastate
+	return dataState, nil
+
+}
+
+// getAllCities is an unexported private function whose purpose is load in a representation
+// of the entire data state in the form of a go structure.
+func getAllCities() (*DataState, error) {
+	// 0. Create container to store large cities
+
+	var cities DataState
 
 	// 1. Open the file storing the state information that we transform
-	newFile, err := os.Open("github.com/major-city-suggestions/datastore/data/canadian_cities")
+	dataStateBuffer, err := os.Open("data/ca.json")
+
 	if err != nil {
-		return []LargeCity{}, err
+		// This is a serious problem and the service isn't able to perform what is intended
+		return nil, err
 	}
-	// 2. Perform a manipulation operation to check if an entry in the file is relevant
 
-	// If the entry is relevant, then we add it to the wrapper storing the large cities
-	return largeCities, nil
+	defer dataStateBuffer.Close()
+
+	// 2. Extract a byte stream from the dataStateBuffer
+	byteStream, err := ioutil.ReadAll(dataStateBuffer)
+	if err != nil {
+		// This is a serious problem and the service isn't able to perform what is intended
+		return nil, err
+	}
+
+	// 3. Unmarshall the byte stream to fit a go structure representation of the byte steam that we can manipulate
+	err = json.Unmarshal(byteStream, &cities)
+	if err != nil {
+		return nil, err
+	}
+
+	// 3. Return cities
+	return &cities, nil
 
 }
-func isRelevant(searchTerm string) bool {
-	return false
+
+// filterForRelevantCities is an unexported private function that filters entries away from
+// from the DataState that are irrelevant to the search term
+func filterForRelevantCities(dataState *DataState, searchTerm string) *DataState {
+	// 1. Create container to store the entries that are determined to be relevant
+	var newDataState DataState
+	// 2. Apply algorithm on each entry and if deemed relevant, add it to the relevant entry container
+	for _, city := range dataState.Cities {
+		if isRelevant(searchTerm, city) {
+			newDataState.Cities = append(newDataState.Cities, city)
+		}
+	}
+	// 3. Return the modified data state
+	return &newDataState
+
 }
 
-// Any additional APIs can be defined below
+// isRelevant is the baseline algorithm used to determine if a city is relevant or not
+func isRelevant(searchTerm string, city LargeCity) bool {
+	return strings.ContainsAny(searchTerm, city.City)
+}
