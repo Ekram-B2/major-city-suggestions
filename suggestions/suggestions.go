@@ -18,9 +18,9 @@ func getSuggestionsForSearchTerm(dataState *datastore.DataState, searchTerm stri
 
 	// 1. Create a suggestion from a city and add it to the wrapper
 	for _, relevantCity := range dataState.Cities {
-		newScore, err := score.CalculateScore(searchTerm, relevantCity)
+		newScore, err := score.CalculateRelevancyScore(searchTerm, relevantCity)
 		if err != nil {
-			// This logic is run when we are unable to calculate a score for a city
+			// This logic is run when we are unable to calculate a score for a city.
 			continue
 		}
 		newSuggestion := Suggestion{city: relevantCity, score: newScore}
@@ -48,7 +48,7 @@ func relevancySort(suggestions []Suggestion) []Suggestion {
 }
 
 // algorithm to swap within a linear datastructure of suggestions
-func swap(suggestions []Suggestion, i, j int) []Suggestion {
+func swap(suggestions []Suggestion, i, j int) {
 	tempSuggestion := suggestions[i]
 	suggestions[i] = suggestions[j]
 	suggestions[j] = tempSuggestion
