@@ -13,8 +13,7 @@ type RankManager interface {
 	CalculateRelevancyScoreWithLatLng(string, float32, float32, datastore.LargeCity) (float32, error)
 }
 
-// min is a function to calculate min with int types (the built-in tool)
-// is set up for float64
+// min is a function to calculate min with int types
 func min(a, b int) int {
 	if a < b {
 		return a
