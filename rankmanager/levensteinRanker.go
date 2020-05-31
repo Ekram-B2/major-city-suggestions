@@ -1,14 +1,17 @@
-package score
+package rankmanager
 
 import (
 	"github.com/major-city-suggestions/datastore"
 )
 
+// LevenSteinRanker is a ranker whose algorithms depend on the levenstein edit formula
+type LevenSteinRanker struct{}
+
 // CalculateRelevancyScore is the algorithm used to calculate a score
-func CalculateRelevancyScore(searchTerm string, city datastore.LargeCity) (float32, error) {
+func (lr *LevenSteinRanker) CalculateRelevancyScore(searchTerm string, city datastore.LargeCity) (float32, error) {
 	var score float32
 	// 1. Calcuate distance with just the characters
-	score += float32(calculateDistanceWithCharacters(searchTerm, city.City))
+	score += float32(lr.calculateDistanceWithCharacters(searchTerm, city.City))
 	// 2. Calculate score using latitude and longitude measurements that is the need
 
 	// 3. Return score
@@ -17,7 +20,7 @@ func CalculateRelevancyScore(searchTerm string, city datastore.LargeCity) (float
 
 // calculateDistanceWithCharacters is an unexported function applied to the min distance
 // using just the characters
-func calculateDistanceWithCharacters(searchTerm, city string) int {
+func (lr *LevenSteinRanker) calculateDistanceWithCharacters(searchTerm, city string) int {
 	// apply levenstein distance
 	if len(searchTerm) == 0 {
 		return len(city)
@@ -49,13 +52,4 @@ func calculateDistanceWithCharacters(searchTerm, city string) int {
 		}
 	}
 	return matrix[len(searchTerm)][len(city)]
-}
-
-// min is a function to calculate min with int types (the built-in tool)
-// is set up for float64
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }
