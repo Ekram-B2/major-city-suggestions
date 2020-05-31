@@ -1,17 +1,13 @@
 package rankmanager
 
-import (
-	"github.com/major-city-suggestions/datastore"
-)
-
 // LevenSteinRanker is a ranker whose algorithms depend on the levenstein edit formula
 type LevenSteinRanker struct{}
 
 // CalculateRelevancyScore is the algorithm used to calculate a score
-func (lr *LevenSteinRanker) CalculateRelevancyScore(searchTerm string, city datastore.LargeCity) (float32, error) {
+func (lr *LevenSteinRanker) CalculateRelevancyScore(searchTerm string, city string) (float32, error) {
 	var score float32
 	// 1. Calcuate distance with just the characters
-	score += float32(lr.calculateDistanceWithCharacters(searchTerm, city.City))
+	score += float32(lr.calculateDistanceWithCharacters(searchTerm, city))
 	// 2. Calculate score using latitude and longitude measurements that is the need
 
 	// 3. Return score
