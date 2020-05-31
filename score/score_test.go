@@ -15,12 +15,12 @@ func Test_min(t *testing.T) {
 		{
 			name: "a_greater_than_b",
 			args: args{a: 6, b: -1},
-			want: 6,
+			want: -1,
 		},
 		{
 			name: "b_greater_than_a",
 			args: args{a: -1, b: 6},
-			want: 6,
+			want: -1,
 		},
 		{
 			name: "a_equal_to_b",
