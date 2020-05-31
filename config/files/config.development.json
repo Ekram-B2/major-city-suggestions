@@ -1,0 +1,6 @@
+{
+    "port": 8080, 
+    "isfile": true,
+    "isjson": true,
+    "filepath": "data/ca.json"
+}
