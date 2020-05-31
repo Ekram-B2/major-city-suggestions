@@ -27,21 +27,21 @@ func calculateDistanceWithCharacters(searchTerm, city string) int {
 		return len(searchTerm)
 	}
 
-	matrix := make([][]int, len(searchTerm))
+	matrix := make([][]int, len(searchTerm)+1)
 	for i := 0; i < len(city); i++ {
-		matrix[i] = make([]int, len(city))
+		matrix[i] = make([]int, len(city)+1)
 	}
-	for i := 0; i < len(searchTerm); i++ {
-		matrix[0][i] = i
+	for i := 1; i < len(searchTerm)+1; i++ {
+		matrix[0][i] = matrix[0][i-1]
 	}
 
-	for i := 0; i < len(city); i++ {
-		matrix[i][0] = i
+	for i := 1; i < len(city)+1; i++ {
+		matrix[i][0] = matrix[i-1][0]
 	}
 
-	for i := 1; i < len(searchTerm); i++ {
-		for j := 1; j < len(city); j++ {
-			if searchTerm[i] == city[j] {
+	for i := 1; i < len(searchTerm)+1; i++ {
+		for j := 1; j < len(city)+1; j++ {
+			if searchTerm[i-1] == city[j-1] {
 				matrix[i][j] = matrix[i-1][j-1]
 			} else {
 				matrix[i][j] = 1 + min(matrix[i-1][j], min(matrix[i][j-1], matrix[i-1][j-1]))
