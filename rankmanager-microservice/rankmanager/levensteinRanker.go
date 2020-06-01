@@ -1,7 +1,5 @@
 package rankmanager
 
-import "fmt"
-
 // LevenSteinRanker is a ranker whose algorithms depend on the levenstein edit formula
 type levenSteinRanker struct{}
 
@@ -48,7 +46,6 @@ func (lr *levenSteinRanker) calculateDistanceWithCharacters(searchTerm, city str
 				matrix[i][j] = matrix[i-1][j-1]
 			} else {
 				matrix[i][j] = 1 + min(matrix[i-1][j], min(matrix[i][j-1], matrix[i-1][j-1]))
-				fmt.Println(matrix[i][j])
 			}
 		}
 	}
