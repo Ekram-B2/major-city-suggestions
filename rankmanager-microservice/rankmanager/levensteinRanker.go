@@ -1,10 +1,12 @@
 package rankmanager
 
+import "fmt"
+
 // LevenSteinRanker is a ranker whose algorithms depend on the levenstein edit formula
-type LevenSteinRanker struct{}
+type levenSteinRanker struct{}
 
 // CalculateRelevancyScore is the algorithm used to calculate a score
-func (lr *LevenSteinRanker) CalculateRelevancyScore(searchTerm string, city string) (float32, error) {
+func (lr levenSteinRanker) calculateRelevancyScore(searchTerm string, city string) (float32, error) {
 	var score float32
 	// 1. Calcuate distance with just the characters
 	score += float32(lr.calculateDistanceWithCharacters(searchTerm, city))
@@ -16,7 +18,7 @@ func (lr *LevenSteinRanker) CalculateRelevancyScore(searchTerm string, city stri
 
 // calculateDistanceWithCharacters is an unexported function applied to the min distance
 // using just the characters
-func (lr *LevenSteinRanker) calculateDistanceWithCharacters(searchTerm, city string) int {
+func (lr *levenSteinRanker) calculateDistanceWithCharacters(searchTerm, city string) int {
 	// apply levenstein distance
 	if len(searchTerm) == 0 {
 		return len(city)
@@ -27,15 +29,17 @@ func (lr *LevenSteinRanker) calculateDistanceWithCharacters(searchTerm, city str
 	}
 
 	matrix := make([][]int, len(searchTerm)+1)
-	for i := 0; i < len(city); i++ {
+
+	for i := 0; i < len(searchTerm)+1; i++ {
 		matrix[i] = make([]int, len(city)+1)
 	}
+
 	for i := 1; i < len(searchTerm)+1; i++ {
-		matrix[0][i] = matrix[0][i-1]
+		matrix[i][0] = matrix[i-1][0] + 1
 	}
 
 	for i := 1; i < len(city)+1; i++ {
-		matrix[i][0] = matrix[i-1][0]
+		matrix[0][i] = matrix[0][i-1] + 1
 	}
 
 	for i := 1; i < len(searchTerm)+1; i++ {
@@ -44,8 +48,13 @@ func (lr *LevenSteinRanker) calculateDistanceWithCharacters(searchTerm, city str
 				matrix[i][j] = matrix[i-1][j-1]
 			} else {
 				matrix[i][j] = 1 + min(matrix[i-1][j], min(matrix[i][j-1], matrix[i-1][j-1]))
+				fmt.Println(matrix[i][j])
 			}
 		}
 	}
 	return matrix[len(searchTerm)][len(city)]
+}
+
+func (lr levenSteinRanker) calculateRelevancyScoreWithLatLng(string, float32, float32, string) (float32, error) {
+	return 0, nil
 }
