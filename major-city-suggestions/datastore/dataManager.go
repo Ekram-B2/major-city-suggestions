@@ -18,8 +18,8 @@ type LargeCity struct {
 	Population       string `json:"population"`
 }
 
-// DataManager is an interface to a flexible run time implementation
-type DataManager interface {
+// Extractable is an interface for extracting data from a managed state
+type Extractable interface {
 
 	// GetAllRelevantCities is the interface used to access all relevant search terms
 	// A data state is returned as a pointer to because it is possible for the state to
