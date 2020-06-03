@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/go-chi/chi"
-	"github.com/go-chi/cors"
-	"github.com/major-city-suggestions/suggestions"
+
+	"github.com/major-city-suggestions/major-city-suggestions/suggestions"
 )
 
 func main() {
@@ -26,14 +26,14 @@ func main() {
 	// set up logic for case where there will be an empty return
 
 	// set up options for CORS
-	corsOptions := cors.Options{
-		AllowedMethods:   []string{"GET", "OPTIONS"},
-		AllowedHeaders:   []string{"Origin", "Accept", "Content-Type", "X-CSRF-Token"},
-		AllowCredentials: true,
-		AllowedOrigins:   []string{"*"},
-	}
-	c := cors.New(corsOptions)
-	r.Use(c.Handler)
+	// corsOptions := cors.Options{
+	// 	AllowedMethods:   []string{"GET", "OPTIONS"},
+	// 	AllowedHeaders:   []string{"Origin", "Accept", "Content-Type", "X-CSRF-Token"},
+	// 	AllowCredentials: true,
+	// 	AllowedOrigins:   []string{"*"},
+	// }
+	// c := cors.New(corsOptions)
+	// r.Use(c.Handler)
 
 	// 3. start up an http server object at port 8080
 

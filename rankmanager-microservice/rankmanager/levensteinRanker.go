@@ -16,14 +16,14 @@ func (lr levenSteinRanker) calculateRelevancyScore(searchTerm string, city strin
 
 // calculateDistanceWithCharacters is an unexported function applied to the min distance
 // using just the characters
-func (lr *levenSteinRanker) calculateDistanceWithCharacters(searchTerm, city string) int {
+func (lr *levenSteinRanker) calculateDistanceWithCharacters(searchTerm, city string) float32 {
 	// apply levenstein distance
 	if len(searchTerm) == 0 {
-		return len(city)
+		return float32(len(city))
 	}
 
 	if len(city) == 0 {
-		return len(searchTerm)
+		return float32(len(searchTerm))
 	}
 
 	matrix := make([][]int, len(searchTerm)+1)
@@ -49,7 +49,15 @@ func (lr *levenSteinRanker) calculateDistanceWithCharacters(searchTerm, city str
 			}
 		}
 	}
-	return matrix[len(searchTerm)][len(city)]
+
+	var longerTerm string
+	if len(searchTerm) > len(city) {
+		longerTerm = searchTerm
+	} else {
+		longerTerm = city
+	}
+
+	return float32(matrix[len(searchTerm)][len(city)]) / float32(len(longerTerm))
 }
 
 func (lr levenSteinRanker) calculateRelevancyScoreWithLatLng(string, float32, float32, string) (float32, error) {

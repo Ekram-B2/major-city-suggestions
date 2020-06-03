@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -18,5 +17,5 @@ func main() {
 	// r.Get("/detemineRankWithLatLng")
 
 	// 3. start up an http server object at port 8080
-	fmt.Println(http.ListenAndServe(":8080", r))
+	http.ListenAndServe(":8081", r)
 }

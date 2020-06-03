@@ -9,7 +9,7 @@ import (
 	l4g "github.com/alecthomas/log4go"
 )
 
-var filePath string = "data/ca.json"
+var filePath string = "datastore/data/ca.json"
 
 // JSONFileManager is a manager for persistant storage stored at a file
 type JSONFileManager struct{}
@@ -46,10 +46,9 @@ func (fm *JSONFileManager) getAllCities() (*DataState, error) {
 
 	// 1. Open the file storing the state information that we transform
 	dataStateBuffer, err := os.Open(filePath)
-
 	if err != nil {
 		// This is a serious problem and the service isn't able to perform what is intended
-		l4g.Error("Unable to open the provided file: %s", err.Error())
+		l4g.Error(err.Error())
 		return nil, err
 	}
 
@@ -59,14 +58,14 @@ func (fm *JSONFileManager) getAllCities() (*DataState, error) {
 	byteStream, err := ioutil.ReadAll(dataStateBuffer)
 	if err != nil {
 		// This is a serious problem and the service isn't able to perform what is intended
-		l4g.Error("Unable to load byte stream from provided file %s", err.Error())
+		l4g.Error(err.Error())
 		return nil, err
 	}
 
 	// 3. Unmarshall the byte stream to fit a go structure representation of the byte steam that we can manipulate
 	err = json.Unmarshal(byteStream, &cities)
 	if err != nil {
-		l4g.Error("Unable to unmarshall byte stream into data state structure %s", err.Error())
+		l4g.Error(err.Error())
 		return nil, err
 	}
 

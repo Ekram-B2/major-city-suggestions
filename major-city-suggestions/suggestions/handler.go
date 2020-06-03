@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/major-city-suggestions/datastore"
+	"github.com/major-city-suggestions/major-city-suggestions/datastore"
 )
 
 type responseFormat struct {
-	suggestions []Suggestion
+	Suggestions []Suggestion `json:"suggestions"`
 }
 
 // HandleRequestForSuggestions is the wrapper for all the logic used to build
@@ -23,9 +23,10 @@ func HandleRequestForSuggestions(rw http.ResponseWriter, req *http.Request) {
 		http.Error(rw, "There was an error retreiving the required search term from within the request.", http.StatusBadRequest)
 		return
 	}
-
 	// 2. Apply the search term in order to render the list of cities that can possibly be suggestions
-	dataStateWithRelevantCities, err := datastore.GetAllRelevantCities(searchTerm)
+	dataManager := datastore.JSONFileManager{}
+
+	dataStateWithRelevantCities, err := dataManager.GetAllRelevantCities(searchTerm)
 	if err != nil {
 		// This is a serious error with how the architecture is meant to be managed and
 		// therefore, we can't recover from this
@@ -37,17 +38,17 @@ func HandleRequestForSuggestions(rw http.ResponseWriter, req *http.Request) {
 	suggestionsForSearchTerm := getSuggestionsForSearchTerm(dataStateWithRelevantCities, searchTerm)
 
 	// 4. Set up the response format to be returned back to the caller
-	responseContent := responseFormat{suggestions: suggestionsForSearchTerm}
+	responseContent := responseFormat{Suggestions: suggestionsForSearchTerm}
 
 	// 5. Set up the response object within content to be returned back to the user
 	rw.Header().Add("Content-Type", "application/json; charset=UTF-8")
+	rw.WriteHeader(http.StatusOK)
 	b := &bytes.Buffer{}
 	err = json.NewEncoder(b).Encode(responseContent)
 	if err != nil {
 		http.Error(rw, "There was an error marshalling to the expected output", http.StatusInternalServerError)
 		return
 	}
-
 	// 6. Write reply content into response object
 	_, err = rw.Write(b.Bytes())
 	if err != nil {

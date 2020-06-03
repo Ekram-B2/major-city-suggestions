@@ -9,8 +9,8 @@ import (
 )
 
 type responseFormat struct {
-	CityName string  `json "cityname"`
-	Rank     float32 `json "rank"`
+	CityName string  `json:"cityname"`
+	Rank     float32 `json:"rank"`
 }
 
 // HandleRequestToDetermineRank is the wrapper for all the logic used to get the rank that is to
@@ -32,7 +32,7 @@ func HandleRequestToDetermineRank(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	// 3. Apply the city and search term recovered to generate a rank
-	rank, err := getRankForCity(searchTerm, city, generateRanker(config.ranker))
+	rank, err := getRankForCity(searchTerm, city, generateRanker("levenstein"))
 	if err != nil {
 		l4g.Error("Unable to get rank from ranking algrithm: %s", err.Error())
 		http.Error(rw, "We were unable to retreive a the rank for this city", http.StatusInternalServerError)
@@ -43,6 +43,7 @@ func HandleRequestToDetermineRank(rw http.ResponseWriter, req *http.Request) {
 
 	// 5. Set up the response object within content to be returned back to the user
 	rw.Header().Add("Content-Type", "application/json; charset=UTF-8")
+	rw.WriteHeader(http.StatusOK)
 	b := &bytes.Buffer{}
 	err = json.NewEncoder(b).Encode(responseContent)
 	if err != nil {

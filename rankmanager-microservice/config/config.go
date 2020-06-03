@@ -17,9 +17,7 @@ type SystemConfiguration struct {
 	// Networking configuration information
 	Port int `json:"port"`
 	// State management information
-	IsFile   bool   `json:"isfile"`
-	IsJSON   bool   `json:"isjson"`
-	FilePath string `json:"filepath"`
+	Ranker string `json:"ranker"`
 }
 
 // LoadConfiguration is a function used to load the configuration information
