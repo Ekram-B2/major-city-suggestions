@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
-
-	"github.com/major-city-suggestions/major-city-suggestions/datastore"
 )
 
 type responseFormat struct {
@@ -26,7 +24,7 @@ func HandleRequestForSuggestions(rw http.ResponseWriter, req *http.Request) {
 	// 2. Apply the search term in order to render the list of cities that can possibly be suggestions
 	dataManager := datastore.JSONFileManager{}
 
-	dataStateWithRelevantCities, err := dataManager.GetAllRelevantCities(searchTerm)
+	dataStateWithRelevantCities, err := relevantreader.NewRelevantFileReader("json")
 	if err != nil {
 		// This is a serious error with how the architecture is meant to be managed and
 		// therefore, we can't recover from this
@@ -35,6 +33,7 @@ func HandleRequestForSuggestions(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	// 3. Given the relevant cities, transform them into suggestions - i.e, the form that we want to return them
+	reader = relevantreader.Rele
 	suggestionsForSearchTerm := getSuggestionsForSearchTerm(dataStateWithRelevantCities, searchTerm)
 
 	// 4. Set up the response format to be returned back to the caller

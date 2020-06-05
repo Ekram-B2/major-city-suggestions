@@ -3,8 +3,8 @@ package suggestions
 import (
 	l4g "github.com/alecthomas/log4go"
 
-	"github.com/major-city-suggestions/major-city-suggestions/datastore"
 	"github.com/major-city-suggestions/major-city-suggestions/rankmanagerclient"
+	"github.com/major-city-suggestions/major-city-suggestions/relevantreader"
 )
 
 // Suggestion is the transformed output that is returned to the user
@@ -16,13 +16,13 @@ type Suggestion struct {
 }
 
 // GetSuggestionsForSearchTerm returns a list of suggestions given the input of large cities
-func getSuggestionsForSearchTerm(dataState *datastore.DataState, searchTerm string) []Suggestion {
+func getSuggestionsForSearchTerm(dataState *relevantreader.Results, searchTerm string) []Suggestion {
 	// 0. Create container to store the suggestions to be returned
 	var suggestions []Suggestion
 
 	// 1. Create a suggestion from a city and add it to the wrapper
 	client := rankmanagerclient.RankManagerClient{}
-	for _, relevantCity := range dataState.Cities {
+	for _, relevantCity := range dataState.GetView() {
 		newRank, err := client.GetRank(searchTerm, relevantCity.City)
 		if err != nil {
 			// This logic is run when we are unable to calculate a score for a city.
