@@ -37,6 +37,7 @@ func main() {
 
 	// 3. start up an http server object at port 8080
 
+	// 4. Run some logic to make sure we can access our data sources
 	http.ListenAndServe(":8080", r)
 }
 
