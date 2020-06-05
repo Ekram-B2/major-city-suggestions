@@ -1,7 +1,7 @@
-package relevantreader
+package results
 
 type Cities struct {
-	Members         []dataPoint
+	Members         []datapoints.dataPoint
 	containsMembers bool
 }
 

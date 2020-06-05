@@ -1,10 +1,11 @@
 package relevantreader
 
-// RelevantReader is an interface for reading in only relevant data from a
-// persistant store
+import "github.com/major-city-suggestions/major-city-suggestions/results"
+
+// RelevantReader supports reading relevant data from a persistant store. Relevant data is
+// partial segment of the global data set with which a rank can be attributed
 type RelevantReader interface {
 
-	// ReadRelevant used to access all relevant search terms
-	// The return should be a reference type since empty results are valid
-	ReadRelevant(string) (*Results, error)
+	// ReadRelevant used to read in relevant data from a persistant store
+	ReadRelevant(string) (results.Results, error)
 }

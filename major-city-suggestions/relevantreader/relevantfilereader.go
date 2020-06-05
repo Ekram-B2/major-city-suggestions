@@ -10,44 +10,34 @@ import (
 	l4g "github.com/alecthomas/log4go"
 )
 
-//files := map[string][]string{"json": []string{"major-city-suggestions/datamanager/data/ca,json"} }
-
-// Structure applied as an interface to access file reading services
+// Unexported reader for reading persistant stores encoded within files
 type relevantFileReader struct {
+	// this is the type of file that the reader can extract from
 	fileType string
-	files    map[string][]string
+	// this is a map of all the files that make up the dataset
+	dataset map[string][]string
 }
 
-// NewRelevantFileReader is a constructor to return a valid interface
-// from which a caller can apply valid read operations. The presently
-// supported types for the reader are: `json`
-func NewRelevantFileReader(fileType string) *relevantFileReader {
+// NewRelevantFileReader is a constructor used to return a valid reader through which
+// valid read operations are applied. The presently supported files types made availible for
+// the reader are: `json`
+func NewRelevantFileReader(fileType, dataset string) *relevantFileReader {
+	// 1. Resolve case where the file type is not a supported type
 	if fileType != "json" {
 		return nil
 	}
-	return &relevantFileReader{fileType: fileType}
+	// 2. Return a structure provisioned with a specified file type and dataset
+	return &relevantFileReader{fileType: fileType, dataset: dataset}
 }
 
-// unmarshallIOIntoStruct applies the appropriate encoder based on the specified file type
-func (rr relevantFileReader) unmarshallIOIntoStruct(byteStream []byte, results map[string]interface{}) error {
-	var err error
-	switch rr.fileType {
-	case "json":
-		err = json.Unmarshal(byteStream, &results)
-	default:
-		err = json.Unmarshal(byteStream, &results)
-	}
-	return err
-}
 
-// ReadRelevant is used to access all relevant terms
+// ReadRelevant is applied to return all terms that are deemed relevant to the search term
 func (rr relevantFileReader) ReadRelevant(searchTerm string) (Results, error) {
 
 	// 1. Retreive unstructured results from datastore
 	unstructuredResults := rr.readAll()
 
-	// 2. Parse unstructured results to produce structured results
-
+	// 2. Parse unstructured results per file to produce structured results
 	resultParser := getParser("city")
 
 	structuredResultsContainer := getStructuredResult("city")
@@ -60,7 +50,7 @@ func (rr relevantFileReader) ReadRelevant(searchTerm string) (Results, error) {
 	// 3. Filter away irrelevant items from the DataState
 	structuredResultsContainer = rr.filterForRelevantDataPoints(structuredResultsContainer, searchTerm)
 
-	// 3. return the new datastate
+	// 4. return the filtered set of results
 	return structuredResultsContainer, nil
 
 }
@@ -70,7 +60,7 @@ func (rr relevantFileReader) readAll() []map[string]interface{} {
 	// 1. Define container to store results
 	var allResults []map[string]interface{}
 
-	// 2. Perform extraction step over each file
+	// 2. Perform extraction operation to produce data from an entire dataset
 	for _, filePath := range rr.files[rr.fileType] {
 		results, err := rr.readAllInFile(filePath)
 		if err != nil {
@@ -83,8 +73,9 @@ func (rr relevantFileReader) readAll() []map[string]interface{} {
 	return allResults
 }
 
-// readAllInFile loads the entire state from a file
-func (rr relevantFileReader) readAllInFile(filePath string) (map[string]interface{}, error) {
+// readAllInFile loads the entire state from a file. The unmarshaller is the algorithm used to convert 
+// a byte stream to fit a go struct
+func (rr relevantFileReader) readAllInFile(filePath string, func unmarshaller) (map[string]interface{}, error) {
 
 	// 1. create a read only file, or log the inability to create a read only file and halt execution
 	fileBuff, err := os.Open(filePath)
@@ -108,7 +99,7 @@ func (rr relevantFileReader) readAllInFile(filePath string) (map[string]interfac
 	results := map[string]interface{}{}
 
 	// 4. Unmarshall the byte stream to the results
-	err = rr.unmarshallIOIntoStruct(byteStream, results)
+	err = rr.unmarshaller(byteStream, results)
 
 	// 5. Log inability to unmarshall and halt execution if error produced
 	if err != nil {
@@ -122,12 +113,12 @@ func (rr relevantFileReader) readAllInFile(filePath string) (map[string]interfac
 }
 
 // filterForRelevantDataPoints filters entries away from from the structured inputthat are irrelevant to the search term
-func (rr relevantFileReader) filterForRelevantDataPoints(results Results, searchTerm string) Results {
+func (rr relevantFileReader) filterForRelevantDataPoints(results Results, searchTerm string, func relevanceAlgorithm) Results {
 	// 1. Create container to store the entries that are determined to be relevant
 	structuredResultsContainer := getStructuredResult("city")
 	// 2. Apply algorithm on each entry and if deemed relevant, add it to the relevant entry container
 	for _, dataPoint := range results.GetView() {
-		if rr.isRelevant(searchTerm, dataPoint) {
+		if relevanceAlgorithm(searchTerm, dataPoint) {
 			structuredResultsContainer.AddDataPoint(dataPoint)
 		}
 	}
@@ -137,6 +128,17 @@ func (rr relevantFileReader) filterForRelevantDataPoints(results Results, search
 }
 
 // // isRelevant is the baseline algorithm used to determine if a city is relevant or not
-func (rr relevantFileReader) isRelevant(searchTerm string, dp dataPoint) bool {
+func isRelevant(searchTerm string, dp dataPoint) bool {
 	return strings.ContainsAny(searchTerm, dp.getRelevancyKey())
+}
+
+
+// unmarshallIOIntoStruct generates an unstructured representation of the dataset.
+func unmarshallJSONIOIntoStruct(byteStream []byte, results map[string]interface{}) (Results, error) {
+	// 1. Define error type in block scope of the entire function
+	var err error
+	// 2. Apply encoder based on specified file type
+	err = json.Unmarshal(byteStream, &results)
+	// 3. return results to caller
+	return results, err
 }

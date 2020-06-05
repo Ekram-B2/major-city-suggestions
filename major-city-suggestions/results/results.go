@@ -1,4 +1,4 @@
-package relevantreader
+package results
 
 // Results is an generic interface for the different types of data
 type Results interface {

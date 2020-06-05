@@ -1,4 +1,6 @@
-package relevantreader
+package results
+
+
 
 // resultParser is applied to define variants of parse logic
 type resultParser interface {
