@@ -12,49 +12,48 @@ import (
 	"github.com/major-city-suggestions/major-city-suggestions/config"
 )
 
-// RankManagerClient is the client software through which to commit requests to the micro-service
+// RankManagerClient is the client software that can retreive from the micro service managing the ranks
 type RankManagerClient struct {
-	// Part of the representation of the Rank Manager Client is the configuration
-	Config config.SystemConfiguration
+	Config config.SystemConfig
 }
 
-// Rank is the definition of the score computed by the microservice
-type Rank struct {
-	CityName string  `json:"Cityname"`
-	Rank     float32 `json:"Rank"`
+// rank is the definition for what is retreived from the microservice
+type rank struct {
+	Name string  `json:"name"`
+	Rank float32 `json:"rank"`
 }
 
-// GetRank is the algorithm used to retreive rank for the city name
-func (client *RankManagerClient) GetRank(searchTerm, city string) (*Rank, error) {
-	// 1. Commit Get request to retreive rank from the remote server
-	resp, err := http.Get(getURLToRankMicroService(searchTerm, city))
+// GetRank is the algorithm used to retreive rank for the real term retreived from persistance against the research term
+func (client *RankManagerClient) GetRank(searchTerm, realTerm string) (rank, error) {
+	// 1. Commit GET request to retreive the rank for this datapoint from the remote server
+	resp, err := http.Get(createURL(searchTerm, realTerm))
 	if err != nil {
-		l4g.Error("Unable to process request for rank from remote server: $s", err.Error())
-		return nil, err
+		l4g.Error("unable to process request to retreive the rank: %s", err.Error())
+		return rank{}, err
 	}
 	defer resp.Body.Close()
-	// 2. From the returned body, read the contents of the body out to a stream
-	respBody, err := ioutil.ReadAll(resp.Body)
+	// 2. Read the contents of the return out to a stram
+	contents, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		l4g.Error("Unable to read byte stream from response body")
-		return nil, err
+		l4g.Error("Unable to read byte stream from response body: %s", err.Error())
+		return rank{}, err
 	}
-	// 3. Unmarshall the content of the body out to a go structure and then return that
-	var rank Rank
+	// 3. Unmarshall the contents out to a rank object
+	var returnedRank rank
 
-	err = json.Unmarshal(respBody, &rank)
+	err = json.Unmarshal(contents, &returnedRank)
 	if err != nil {
-		//l4g.Error("Unable to unmarshall byte stream into rank structure %s", err.Error())
-		return nil, err
+		l4g.Error("unable to unmarshall byte stream into rank structure %s", err.Error())
+		return rank{}, err
 	}
 
 	// 4. Return the rank
-	return &rank, nil
+	return returnedRank, nil
 }
 
-func getURLToRankMicroService(searchTerm, city string) string {
+func createURL(searchTerm, realTerm string) string {
 	modifiedSearchTerm := strings.ReplaceAll(searchTerm, " ", "%20")
-	modifiedCity := strings.ReplaceAll(city, " ", "%20")
-	return fmt.Sprintf("http://127.0.0.1:8081/determineRank?searchTerm=%s&city=%s", modifiedSearchTerm, modifiedCity)
+	modifiedRealTerm := strings.ReplaceAll(realTerm, " ", "%20")
+	return fmt.Sprintf("http://127.0.0.1:8081/determineRank?searchTerm=%s&realTerm=%s", modifiedSearchTerm, modifiedRealTerm)
 
 }

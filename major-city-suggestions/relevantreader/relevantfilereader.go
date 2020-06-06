@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"strings"
 
 	l4g "github.com/alecthomas/log4go"
 
+	"github.com/major-city-suggestions/major-city-suggestions/dataset"
 	"github.com/major-city-suggestions/major-city-suggestions/results"
 )
 
@@ -24,12 +24,18 @@ type relevantFileReader struct {
 // NewRelevantFileReader is a constructor used to return a valid reader through which
 // valid read operations are applied. The presently supported files types made availible for
 // the reader are: `json`
-func NewRelevantFileReader(dataPoint, fileType string, dataset map[string][]string) *relevantFileReader {
+func NewRelevantFileReader(dataPoint, fileType string, dataloader dataset.DataLoader) *relevantFileReader {
 	// 1. Resolve case where the file type is not a supported type
 	if fileType != "json" {
 		return nil
 	}
-	// 2. Return a structure provisioned with a specified file type and dataset
+	// 2. Load dataset into project
+	dataset, err := dataloader()
+	if err != nil {
+		l4g.Error("sas unable to read in persistant files from the data set")
+		return nil
+	}
+	// 3. Return a structure provisioned with a specified file type and dataset
 	return &relevantFileReader{fileType: fileType, dataset: dataset, dataPoint: dataPoint}
 }
 
@@ -49,7 +55,7 @@ func (rr relevantFileReader) ReadRelevant(searchTerm string) (results.Results, e
 	}
 
 	// 3. Filter away irrelevant items from the DataState
-	structuredResultsContainer = rr.filterForRelevantDataPoints(searchTerm, structuredResultsContainer, isRelevant)
+	structuredResultsContainer = rr.filterForRelevantDataPoints(searchTerm, structuredResultsContainer, results.IsRelevantCity)
 
 	// 4. return the filtered set of results
 	return structuredResultsContainer, nil
@@ -126,9 +132,4 @@ func (rr relevantFileReader) filterForRelevantDataPoints(searchTerm string, resu
 	// 3. Return the modified data state
 	return structuredResultsContainer
 
-}
-
-// isRelevant is the baseline algorithm used to determine if a city is relevant or not
-func isRelevant(searchTerm string, dp results.DataPoint) bool {
-	return strings.ContainsAny(searchTerm, dp.GetRelevancyKey())
 }

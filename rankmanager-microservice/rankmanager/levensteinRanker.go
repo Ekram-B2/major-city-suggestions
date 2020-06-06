@@ -1,13 +1,13 @@
 package rankmanager
 
-// LevenSteinRanker is a ranker whose algorithms depend on the levenstein edit formula
+// levenSteinRanker is a ranker whose algorithms depend on the levenstein edit formula
 type levenSteinRanker struct{}
 
-// CalculateRelevancyScore is the algorithm used to calculate a score
-func (lr levenSteinRanker) calculateRelevancyScore(searchTerm string, city string) (float32, error) {
+// calculateRelevancyScore is the algorithm used to calculate a score
+func (lr levenSteinRanker) calculateRank(searchTerm, realTerm string) (float32, error) {
 	var score float32
 	// 1. Calcuate distance with just the characters
-	score += float32(lr.calculateDistanceWithCharacters(searchTerm, city))
+	score += float32(lr.calculateDistanceWithCharacters(searchTerm, realTerm))
 	// 2. Calculate score using latitude and longitude measurements that is the need
 
 	// 3. Return score

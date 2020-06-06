@@ -22,6 +22,10 @@ func (t testDataPoint) Equals(DataPoint) bool {
 	return false
 }
 
+func (t testDataPoint) GetHash() string {
+	return ""
+}
+
 func Test_city_CanBeCreatedFrom(t *testing.T) {
 	type fields struct {
 		City             string

@@ -25,6 +25,7 @@ func main() {
 
 	// set up logic for case where there will be an empty return
 
+	//
 	// set up options for CORS
 	// corsOptions := cors.Options{
 	// 	AllowedMethods:   []string{"GET", "OPTIONS"},

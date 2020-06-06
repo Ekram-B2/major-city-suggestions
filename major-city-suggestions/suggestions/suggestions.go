@@ -4,10 +4,10 @@ import (
 	l4g "github.com/alecthomas/log4go"
 
 	"github.com/major-city-suggestions/major-city-suggestions/rankmanagerclient"
-	"github.com/major-city-suggestions/major-city-suggestions/relevantreader"
+	"github.com/major-city-suggestions/major-city-suggestions/results"
 )
 
-// Suggestion is the transformed output that is returned to the user
+// Suggestion is the transformed output presented bacl to the client
 type Suggestion struct {
 	Name      string  `json:"name"`
 	Latitude  string  `json:"latitude"`
@@ -15,27 +15,27 @@ type Suggestion struct {
 	Score     float32 `json:"score"`
 }
 
-// GetSuggestionsForSearchTerm returns a list of suggestions given the input of large cities
-func getSuggestionsForSearchTerm(dataState *relevantreader.Results, searchTerm string) []Suggestion {
+// convertResultsIntoSugestions returns a list of suggestions given the input of large cities
+func convertResultsIntoSugestions(results results.Results, searchTerm string, latFinder results.LatFinder, lngFinder results.LngFinder) []Suggestion {
 	// 0. Create container to store the suggestions to be returned
 	var suggestions []Suggestion
 
 	// 1. Create a suggestion from a city and add it to the wrapper
 	client := rankmanagerclient.RankManagerClient{}
-	for _, relevantCity := range dataState.GetView() {
-		newRank, err := client.GetRank(searchTerm, relevantCity.City)
+	for _, dp := range results.GetView() {
+		newRank, err := client.GetRank(searchTerm, dp.GetHash())
 		if err != nil {
 			// This logic is run when we are unable to calculate a score for a city.
-			l4g.Error("Unable to calculate the rank for this city.")
+			l4g.Error("unable to calculate the rank for this datapoint: %s", err.Error())
 			continue
 		}
-		newSuggestion := Suggestion{Name: getSuggestionName(relevantCity), Latitude: relevantCity.Lat, Longitude: relevantCity.Lng, Score: newRank.Rank}
+		newSuggestion := Suggestion{Name: dp.GetHash(), Latitude: latFinder(dp), Longitude: lngFinder(dp), Score: newRank.Rank}
 		suggestions = append(suggestions, newSuggestion)
 	}
 
-	// 2. perform relevancy sort in order to set up the order within which suggestions will be returned back to the user
+	// 2. Perform a relevancy based on the score to build ordering to return suggestions list
 	relevancySort(suggestions)
-	// 3. return list of suggestions now within the order that they will be returned
+	// 3. Return suggestions back to caller
 	return suggestions
 
 }
@@ -57,8 +57,4 @@ func swap(suggestions []Suggestion, i, j int) {
 	tempSuggestion := suggestions[i]
 	suggestions[i] = suggestions[j]
 	suggestions[j] = tempSuggestion
-}
-
-func getSuggestionName(city datastore.LargeCity) string {
-	return city.City + ", " + city.Admin + ", " + city.ISO2
 }

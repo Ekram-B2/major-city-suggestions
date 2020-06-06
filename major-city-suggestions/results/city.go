@@ -27,7 +27,7 @@ func (c city) GetStateMutators() map[string]mutator {
 		"lng":              c.setLng}
 }
 
-// IsDataPoint to determine if a set of properties owned by an object meets the minimum required to
+// CanBeCreatedFrom is applied to determine if a set of properties owned by an object meets the minimum required to
 // represent a datapoint
 func (c city) CanBeCreatedFrom(foundProperties []string) bool {
 	index := 0
@@ -59,6 +59,11 @@ func (c city) GetDataPointType() string {
 // GetRelevancyKey returns the relevancy key that is applied within a relvancy detection algorithm
 func (c city) GetRelevancyKey() string {
 	return c.City
+}
+
+// Hash returns a string representation of the data point
+func (c city) GetHash() string {
+	return c.City + ", " + c.Admin + ", " + c.ISO2
 }
 
 // Equals is applied to compare two data points for equality

@@ -1,6 +1,6 @@
 {
-    "port": 8080, 
-    "isfile": true,
+    "datapointtype": "city", 
+    "filetype": "json",
     "isjson": true,
-    "filepath": "data/ca.json"
+    "filepaths": ["data/ca.json"]
 }

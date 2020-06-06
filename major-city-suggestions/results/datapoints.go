@@ -10,6 +10,8 @@ type DataPoint interface {
 	GetStateMutators() map[string]mutator
 	// Equals is used to detemine if datapoints are equals
 	Equals(DataPoint) bool
+	// GetHash is used to return the name of the data point
+	GetHash() string
 }
 
 // mutator is a function that changes the state of a datapoint
