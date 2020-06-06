@@ -33,28 +33,7 @@ func convertResultsIntoSugestions(results results.Results, searchTerm string, la
 		suggestions = append(suggestions, newSuggestion)
 	}
 
-	// 2. Perform a relevancy based on the score to build ordering to return suggestions list
-	relevancySort(suggestions)
-	// 3. Return suggestions back to caller
+	// 2. return suggestions
 	return suggestions
 
-}
-
-// algorithm to perform a sort on a linear datastructure of suggestions
-func relevancySort(suggestions []Suggestion) {
-	// set up a bubble sort for now
-	for end := len(suggestions) - 1; end > 0; end-- {
-		for index := 0; index < end; index++ {
-			if suggestions[index].Score > suggestions[index+1].Score {
-				swap(suggestions, index, index+1)
-			}
-		}
-	}
-}
-
-// algorithm to swap within a linear datastructure of suggestions
-func swap(suggestions []Suggestion, i, j int) {
-	tempSuggestion := suggestions[i]
-	suggestions[i] = suggestions[j]
-	suggestions[j] = tempSuggestion
 }

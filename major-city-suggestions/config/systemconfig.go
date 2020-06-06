@@ -13,8 +13,30 @@ var productionEnvironmentPath string = "PROD"
 
 // SystemConfig is the config info set within production and development modes
 type SystemConfig struct {
-	DataPointType string `json:"datapointtype"`
-	FileType      string `json:"filetype"`
+	DataPointType      string   `json:"datapointtype"`
+	FileType           string   `json:"filetype"`
+	IsRemote           bool     `json:"isremoteclient"`
+	MinimalKeySet      []string `json:"minimalkeyset"`
+	CharDistCalculator string   `json:"chardistcalculator"`
+}
+
+func (sc SystemConfig) GetCharDistCalculator() string {
+	return sc.CharDistCalculator
+}
+func (sc SystemConfig) GetMinimalKeySet() []string {
+	return sc.MinimalKeySet
+}
+
+func (sc SystemConfig) GetDataPointType() string {
+	return sc.DataPointType
+}
+
+func (sc SystemConfig) GetFileType() string {
+	return sc.FileType
+}
+
+func (sc SystemConfig) IsRemoteClient() bool {
+	return sc.IsRemote == true
 }
 
 // LoadConfiguration used to load the configuration information to a go structure

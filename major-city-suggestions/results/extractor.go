@@ -4,7 +4,7 @@ import "errors"
 
 type extractor func(map[string]interface{}) (interface{}, error)
 
-func GetSampleSetFromDataset(dataSet map[string]interface{}) (interface{}, error) {
+func GetCitySetFromDataset(dataSet map[string]interface{}) (interface{}, error) {
 	var empty interface{}
 
 	if _, ok := dataSet["cities"]; !ok {
@@ -12,4 +12,13 @@ func GetSampleSetFromDataset(dataSet map[string]interface{}) (interface{}, error
 	}
 
 	return empty, errors.New("unable to located cities")
+}
+
+func GetExtractorForDataPoint(dataPoint string) extractor {
+	switch dataPoint {
+	case "city":
+		return GetCitySetFromDataset
+	default:
+		return GetCitySetFromDataset
+	}
 }

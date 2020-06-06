@@ -15,6 +15,15 @@ type manifest struct {
 	files []string `json:"files"`
 }
 
+func GetLoader(dataPointType string) DataLoader {
+	switch dataPointType {
+	case "city":
+		return LoadPersistanceFiles
+	default:
+		return LoadPersistanceFiles
+	}
+}
+
 // LoadPersistanceFiles gets a map of persistant files based ons file type
 func LoadPersistanceFiles() (map[string][]string, error) {
 

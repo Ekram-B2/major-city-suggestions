@@ -6,6 +6,8 @@ import (
 	l4g "github.com/alecthomas/log4go"
 )
 
+type unmarshaller func([]byte, map[string]interface{}) (map[string]interface{}, error)
+
 // unmarshallIOIntoStruct generates an unstructured representation of the dataset.
 func unmarshallJSONIOIntoStruct(byteStream []byte, resultSet map[string]interface{}) (map[string]interface{}, error) {
 	// 1. Define container to unmarshall byte stream

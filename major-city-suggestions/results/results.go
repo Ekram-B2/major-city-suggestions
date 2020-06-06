@@ -16,8 +16,8 @@ type Results interface {
 	ContainsMembers() bool
 }
 
-// GetStructuredResultForm is a factory applies to initialize result types
-func GetStructuredResultForm(dataPoint string) Results {
+// GetStructuredResultFormat is a factory applies to initialize result types
+func GetStructuredResultFormat(dataPoint string) Results {
 	switch dataPoint {
 	case "cities":
 		return Cities{}

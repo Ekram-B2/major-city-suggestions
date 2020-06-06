@@ -7,6 +7,7 @@ import (
 
 	l4g "github.com/alecthomas/log4go"
 
+	"github.com/major-city-suggestions/major-city-suggestions/config"
 	"github.com/major-city-suggestions/major-city-suggestions/dataset"
 	"github.com/major-city-suggestions/major-city-suggestions/results"
 )
@@ -19,14 +20,16 @@ type relevantFileReader struct {
 	dataset map[string][]string
 	// this is the datapoint type that is read in
 	dataPoint string
+	// this is the minimal keyset
+	minimalKeySet []string
 }
 
 // NewRelevantFileReader is a constructor used to return a valid reader through which
 // valid read operations are applied. The presently supported files types made availible for
 // the reader are: `json`
-func NewRelevantFileReader(dataPoint, fileType string, dataloader dataset.DataLoader) *relevantFileReader {
+func NewRelevantFileReader(config config.Config, dataloader dataset.DataLoader) *relevantFileReader {
 	// 1. Resolve case where the file type is not a supported type
-	if fileType != "json" {
+	if config.GetFileType() != "json" {
 		return nil
 	}
 	// 2. Load dataset into project
@@ -36,7 +39,7 @@ func NewRelevantFileReader(dataPoint, fileType string, dataloader dataset.DataLo
 		return nil
 	}
 	// 3. Return a structure provisioned with a specified file type and dataset
-	return &relevantFileReader{fileType: fileType, dataset: dataset, dataPoint: dataPoint}
+	return &relevantFileReader{fileType: config.GetFileType(), dataset: dataset, dataPoint: config.GetDataPointType(), minimalKeySet: config.GetMinimalKeySet()}
 }
 
 // ReadRelevant is applied to return all terms that are deemed relevant to the search term
@@ -46,19 +49,22 @@ func (rr relevantFileReader) ReadRelevant(searchTerm string) (results.Results, e
 	unstructuredResults := rr.readAll()
 
 	// 2. Get container for structured results
-	structuredResultsContainer := results.GetStructuredResultForm(rr.dataPoint)
-	// 2. Convert the unstructured results into structured results
-	resultsParser := results.NewResultsParser([]string{}, "", "")
+	structuredResultsFormat := results.GetStructuredResultFormat(rr.dataPoint)
+	// 3. Convert the unstructured results into structured results
+	resultsParser := results.NewResultsParser(rr.minimalKeySet, rr.dataPoint)
 	for _, file := range unstructuredResults {
-		resultsForFile := resultsParser.ParseUnstructuredResult(file, results.GetSampleSetFromDataset, results.ConvertSampleToDataPoint, rr.dataPoint)
-		structuredResultsContainer.CombineWith(resultsForFile)
+		resultsForFile, wasFileParsed := resultsParser.ParseUnstructuredResult(file, results.GetExtractorForDataPoint(rr.dataPoint), results.ConvertSampleToDataPoint, rr.dataPoint)
+		if wasFileParsed == true {
+			structuredResultsFormat.CombineWith(resultsForFile)
+		}
+
 	}
 
-	// 3. Filter away irrelevant items from the DataState
-	structuredResultsContainer = rr.filterForRelevantDataPoints(searchTerm, structuredResultsContainer, results.IsRelevantCity)
+	// 4. Filter away irrelevant items from the DataState
+	structuredResultsFormat = rr.filterForRelevantDataPoints(searchTerm, structuredResultsFormat, results.GetRelevanceDetector(rr.dataPoint))
 
-	// 4. return the filtered set of results
-	return structuredResultsContainer, nil
+	// 5. return the filtered set of results
+	return structuredResultsFormat, nil
 
 }
 
@@ -71,7 +77,7 @@ func (rr relevantFileReader) readAll() []map[string]interface{} {
 	for _, filePath := range rr.dataset[rr.fileType] {
 		results, err := rr.readAllInFile(filePath, unmarshallJSONIOIntoStruct)
 		if err != nil {
-			l4g.Error(fmt.Sprintf("Unable to read file with path: %s", filePath))
+			l4g.Error(fmt.Sprintf("unable to read file with path: %s", filePath))
 			continue
 		}
 		allResults = append(allResults, results)
@@ -87,8 +93,7 @@ func (rr relevantFileReader) readAllInFile(filePath string, unmarshallerAlgorith
 	// 1. create a read only file, or log the inability to create a read only file and halt execution
 	fileBuff, err := os.Open(filePath)
 	if err != nil {
-		// This is a serious problem and the service isn't able to perform what is intended
-		l4g.Error(err.Error())
+		l4g.Error(fmt.Sprintf("unable to open file %s", err.Error()))
 		return nil, err
 	}
 
@@ -97,8 +102,7 @@ func (rr relevantFileReader) readAllInFile(filePath string, unmarshallerAlgorith
 	// 2. Extract a utf-8 backed bytestream from the file, or log the inability to extract stram and halt execution
 	byteStream, err := ioutil.ReadAll(fileBuff)
 	if err != nil {
-		// This is a serious problem and the service isn't able to perform what is intended
-		l4g.Error(err.Error())
+		l4g.Error("unable to create byte stream from file: %s", err.Error())
 		return nil, err
 	}
 
@@ -110,7 +114,7 @@ func (rr relevantFileReader) readAllInFile(filePath string, unmarshallerAlgorith
 
 	// 5. Log inability to unmarshall and halt execution if error produced
 	if err != nil {
-		l4g.Error(err.Error())
+		l4g.Error(fmt.Sprintf("unable to unmarshall bytestream into go object %s", err.Error()))
 		return nil, err
 	}
 
@@ -120,9 +124,9 @@ func (rr relevantFileReader) readAllInFile(filePath string, unmarshallerAlgorith
 }
 
 // filterForRelevantDataPoints filters entries away from from the structured inputthat are irrelevant to the search term
-func (rr relevantFileReader) filterForRelevantDataPoints(searchTerm string, resultsSet results.Results, relevanceAlgorithm relevanceDetector) results.Results {
+func (rr relevantFileReader) filterForRelevantDataPoints(searchTerm string, resultsSet results.Results, relevanceAlgorithm results.RelevanceDetector) results.Results {
 	// 1. Create container to store the entries that are determined to be relevant
-	structuredResultsContainer := results.GetStructuredResultForm(rr.dataPoint)
+	structuredResultsContainer := results.GetStructuredResultFormat(rr.dataPoint)
 	// 2. Apply algorithm on each entry and if deemed relevant, add it to the relevant entry container
 	for _, dataSample := range resultsSet.GetView() {
 		if relevanceAlgorithm(searchTerm, dataSample) {

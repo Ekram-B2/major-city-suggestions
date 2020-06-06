@@ -1,38 +1,17 @@
 package rankmanager
 
-import l4g "github.com/alecthomas/log4go"
-
-// rankCalculator is applied to calculate rank of real terms
-type rankCalculator interface {
-	// calculateRank is the algorithm used to calculate a relevancy score
-	calculateRank(string, string) (float32, error)
-
-	// calculateRankWithLatLng is the algorithm used to calculate a score relevancy score with considerations made for latitude and longitude
-	calculateRelevancyScoreWithLatLng(string, float32, float32, string) (float32, error)
+// Apply the calculateRank function to compute a rank between the searchTerm and the realTerm
+func getRank(searchTerm, realTerm string, charDistCalc charDistanceCalculator) float32 {
+	// 1. Calcuate distance with just the characters
+	score := float32(charDistCalc(searchTerm, realTerm))
+	// 2. Return score
+	return score
 }
 
-// getRankForRealTerm is the service the converts a real term into a number between [0, 1]. ,s
-func getRankForRealTerm(searchTerm, realTerm string, rm rankCalculator) (float32, error) {
-	rank, err := rm.calculateRank(searchTerm, realTerm)
-	if err != nil {
-		l4g.Error("the rank calculator algorithm was unable to get a rank for the city: %s", err.Error())
-		return 0, err
+// Decorate the rank calculator algorithm if lat and lng values are present
+func getRankWithLatLng(searchTermLat, searchTermLng, realTermLat, realTermLng float32, searchTerm, realTerm string, charDistCalc charDistanceCalculator, latLngDist latLngDistanceCalculator) charDistanceCalculator {
+	return func(searchOne, realTerm string) float32 {
+		// Apply modification and return decorated function back to caller
+		return latlngDistCalculator(searchTermLat, searchTermLng, realTermLat, realTermLng) + getRank(searchTerm, realTerm, charDistCalc)
 	}
-	return rank, nil
-}
-
-// generateRanker is a factory pattern that gets a concrete rankCalculator
-func generateRanker(ranker string) rankCalculator {
-	if ranker == "levenstein" {
-		return levenSteinRanker{}
-	}
-	return nil
-}
-
-// min is a function to calculate min with int types
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }

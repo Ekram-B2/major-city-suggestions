@@ -2,5 +2,7 @@
     "datapointtype": "city", 
     "filetype": "json",
     "isjson": true,
-    "filepaths": ["data/ca.json"]
+    "filepaths": ["data/ca.json"],
+    "minimalkeyset": ["city", "country", "is02", "lng", "lat"],
+    "chardistancedalculator": "levenstein"
 }

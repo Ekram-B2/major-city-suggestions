@@ -8,13 +8,12 @@ import (
 
 type resultsParser struct {
 	dataProperties []string
-	filePath       string
 	dataPoint      string
 }
 
 // NewResultsParser is a constructor to create a resultParser with a valid state
-func NewResultsParser(dataProperties []string, filePath, dataPoint string) resultsParser {
-	return resultsParser{dataProperties: dataProperties, filePath: filePath, dataPoint: dataPoint}
+func NewResultsParser(dataProperties []string, dataPoint string) resultsParser {
+	return resultsParser{dataProperties: dataProperties, dataPoint: dataPoint}
 }
 func (rp resultsParser) verifyIfDataPointExists(sample interface{}, converter converter, dataPoint DataPoint) (bool, DataPoint) {
 
@@ -29,21 +28,21 @@ func (rp resultsParser) verifyIfDataPointExists(sample interface{}, converter co
 	return true, dataPoint
 }
 
-func (rp resultsParser) ParseUnstructuredResult(dataSet map[string]interface{}, extractor extractor, converter converter, dataPointType string) Results {
+func (rp resultsParser) ParseUnstructuredResult(dataSet map[string]interface{}, extractor extractor, converter converter, dataPointType string) (res Results, isParsed bool) {
 
-	structuredResultsContainer := GetStructuredResultForm(dataPointType)
+	structuredResultsContainer := GetStructuredResultFormat(dataPointType)
 
 	defer func() {
 		if r := recover(); r != nil {
-			l4g.Error(fmt.Sprintf("formatting for file %s does not match the expectations of the parser", rp.filePath))
+			l4g.Error(fmt.Sprintf("formatting for file does not match the expectations of the parser"))
 		}
 	}()
 
 	sampleSet, err := extractor(dataSet)
 
 	if err != nil {
-		l4g.Error("unable to extract city related samples from the data store")
-		return structuredResultsContainer
+		l4g.Error(fmt.Sprintf("unable to extract city related samples from the data store: %s", err.Error()))
+		return structuredResultsContainer, false
 	}
 
 	for _, sample := range sampleSet.([]interface{}) {
@@ -55,7 +54,7 @@ func (rp resultsParser) ParseUnstructuredResult(dataSet map[string]interface{}, 
 		}
 	}
 
-	return structuredResultsContainer
+	return structuredResultsContainer, true
 }
 
 func isAMember(key string, properties []string) bool {
