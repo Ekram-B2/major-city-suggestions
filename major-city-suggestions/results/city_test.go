@@ -86,7 +86,7 @@ func Test_city_CanBeCreatedFrom(t *testing.T) {
 		})
 	}
 }
-func Test_results_GetSource(t *testing.T) {
+func Test_results_GetDataPointType(t *testing.T) {
 	// Create a city object (Arrange)
 	city := city{}
 
