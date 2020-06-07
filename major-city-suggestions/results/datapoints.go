@@ -14,7 +14,7 @@ type DataPoint interface {
 	GetHash() string
 }
 
-// mutator is a function that changes the state of a datapoint
+// mutator is a operation that changes the state of a datapoint
 type mutator func(string) DataPoint
 
 // GetDataPoint is a factory applied to initialize datapoint types

@@ -27,15 +27,15 @@ type relevantFileReader struct {
 // NewRelevantFileReader is a constructor used to return a valid reader through which
 // valid read operations are applied. The presently supported files types made availible for
 // the reader are: `json`
-func NewRelevantFileReader(config config.Config, dataloader dataset.DataLoader) *relevantFileReader {
+func NewRelevantFileReader(config config.Config, manifestPathGetter dataset.ManifestPathGetter, dataSetBuilder dataset.DataSetBuilder, dataloader dataset.DataLoader) *relevantFileReader {
 	// 1. Resolve case where the file type is not a supported type
 	if config.GetFileType() != "json" {
 		return nil
 	}
 	// 2. Load dataset into project
-	dataset, err := dataloader()
+	dataset, err := dataloader(manifestPathGetter, dataSetBuilder)
 	if err != nil {
-		l4g.Error("sas unable to read in persistant files from the data set")
+		l4g.Error("was unable to read in persistant files from the data set")
 		return nil
 	}
 	// 3. Return a structure provisioned with a specified file type and dataset

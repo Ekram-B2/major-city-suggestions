@@ -2,16 +2,16 @@ package dataset
 
 import "strings"
 
-// dataSetBuilder defines the operation for converting a manifest into a dataset
-type dataSetBuilder func(manifest manifest) map[string][]string
+// DataSetBuilder defines the operation for converting a manifest into a dataset
+type DataSetBuilder func(manifest Manifest) map[string][]string
 
 // manifest is a type that stores the list of file paths making up a dataset based
-type manifest struct {
+type Manifest struct {
 	Files []string `json:"files"`
 }
 
-// getDatasetBuilderOp is a factory that returns the dataSetBuilder op to apply
-func getDatasetBuilderOp(opType string) dataSetBuilder {
+// GetDatasetBuilderOp is a factory that returns the dataSetBuilder op to apply
+func GetDatasetBuilderOp(opType string) DataSetBuilder {
 	switch opType {
 	case "default":
 		return defaultbuildDataSetFrom
@@ -27,7 +27,7 @@ func getExtension(file string) string {
 }
 
 // defaultbuildDataSetFrom is an implementation that builds a dataset from a manifest
-func defaultbuildDataSetFrom(manifest manifest) map[string][]string {
+func defaultbuildDataSetFrom(manifest Manifest) map[string][]string {
 	var dataset map[string][]string
 	// 1. From the manifest, populate the dataset
 	for _, file := range manifest.Files {

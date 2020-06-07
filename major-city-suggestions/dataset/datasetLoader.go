@@ -9,12 +9,12 @@ import (
 )
 
 // DataLoader is a type referencing operations used to load file paths that make up a dataset based on file type
-type DataLoader func() (map[string][]string, error)
+type DataLoader func(ManifestPathGetter, DataSetBuilder) (map[string][]string, error)
 
 // LoadPersistanceFiles gets a map of persistant files based on file type
-func LoadPersistanceFiles(manifestPathGetter manifestPathGetter, dataSetBuilder dataSetBuilder) (map[string][]string, error) {
+func LoadPersistanceFiles(manifestPathGetter ManifestPathGetter, dataSetBuilder DataSetBuilder) (map[string][]string, error) {
 
-	var manifest manifest
+	var manifest Manifest
 
 	// 1. Open the file storing the dataset manifest
 	datasetBuffer, err := os.Open(manifestPathGetter())

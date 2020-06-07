@@ -6,8 +6,10 @@ import (
 	l4g "github.com/alecthomas/log4go"
 )
 
+// converter is an operation that determines if an extracted sample is a datapoint
 type converter func(interface{}, DataPoint, []string) ([]string, DataPoint)
 
+// ConvertSampleToDataPoint is an implementation that converts a sanmple to a datapoint if possible
 func ConvertSampleToDataPoint(sample interface{}, dataPoint DataPoint, dataProperties []string) ([]string, DataPoint) {
 	// 1. Get the state mutator
 	stateMutator := dataPoint.GetStateMutators()

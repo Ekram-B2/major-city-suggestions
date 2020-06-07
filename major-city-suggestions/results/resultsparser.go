@@ -16,7 +16,7 @@ func NewResultsParser(dataProperties []string, dataPoint string) resultsParser {
 	return resultsParser{dataProperties: dataProperties, dataPoint: dataPoint}
 }
 func (rp resultsParser) verifyIfDataPointExists(sample interface{}, converter converter, dataPoint DataPoint) (bool, DataPoint) {
-
+	// 1. Get the data point and the subset of properties found to match the minimal set defined within the config
 	minimalProperties, dataPoint := converter(sample, dataPoint, rp.dataProperties)
 
 	// 2. See if there are enough properties defined to complete a datapoint sufficient for the remainder of the implementation
@@ -58,10 +58,13 @@ func (rp resultsParser) ParseUnstructuredResult(dataSet map[string]interface{}, 
 }
 
 func isAMember(key string, properties []string) bool {
+	// 1. Iterate over property list to determine if key belongs to set
 	for _, property := range properties {
 		if key == property {
+			// return true if key is found in set
 			return true
 		}
 	}
+	// return false if key is not found in set
 	return false
 }

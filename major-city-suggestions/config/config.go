@@ -15,7 +15,7 @@ type Config interface {
 // GetConfiguration is a factory applied to load a configuration object based on the breadth of its used
 func GetConfiguration(configType string) (Config, error) {
 	switch configType {
-	case "project":
+	case "system":
 		config := SystemConfig{}
 		loadedConfig, err := config.LoadConfiguration(getConfigPathOp(os.Getenv("CONFIG_PATH_TYPE")))
 		if err != nil {

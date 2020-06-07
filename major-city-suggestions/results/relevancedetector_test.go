@@ -17,7 +17,7 @@ func Test_relevantfilereader_IsRelevantCity(t *testing.T) {
 
 	// 5. Determine if computed output matches expected (Assert)
 	if actualRes != expectedRes {
-		t.Fatalf("unable to determine if city is relevant")
+		t.Fatalf("unable to determine if city is relevant; the actual is %v and the expected is %v", actualRes, expectedRes)
 	}
 
 }
