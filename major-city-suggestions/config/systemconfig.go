@@ -8,9 +8,6 @@ import (
 	l4g "github.com/alecthomas/log4go"
 )
 
-var localEnvironmentPath string = "LOC"
-var productionEnvironmentPath string = "PROD"
-
 // SystemConfig is the config info set within production and development modes
 type SystemConfig struct {
 	DataPointType      string   `json:"datapointtype"`
@@ -20,30 +17,41 @@ type SystemConfig struct {
 	CharDistCalculator string   `json:"chardistcalculator"`
 }
 
+// GetCharDistCalculator is applied to get the config for the distance calculator between two strings when
+// only considering characters
 func (sc SystemConfig) GetCharDistCalculator() string {
 	return sc.CharDistCalculator
 }
+
+// GetMinimalKeySet is applied to get the minimal key set that is representative of what minimal subset of properties
+// must be present for the data point to be recognised
 func (sc SystemConfig) GetMinimalKeySet() []string {
 	return sc.MinimalKeySet
 }
 
+// GetDataPointType is applied to get the data point that will be extracted from the data set. Setting the property is
+// expecially important if data points are being drawn from files
 func (sc SystemConfig) GetDataPointType() string {
 	return sc.DataPointType
 }
 
+// GetFileType is applied to return the type of file that are being read from. Different file types can have different
+// encodings
 func (sc SystemConfig) GetFileType() string {
 	return sc.FileType
 }
 
+// IsRemoteClient is applied to determine if the reader interface is backed by a remote server implementation, or if
+// the data set is representative of files stored on the local system
 func (sc SystemConfig) IsRemoteClient() bool {
 	return sc.IsRemote == true
 }
 
 // LoadConfiguration used to load the configuration information to a go structure
-func (sc SystemConfig) LoadConfiguration() (Config, error) {
+func (sc SystemConfig) LoadConfiguration(getConfigPathOp configPathGetter) (Config, error) {
 
-	// 1. Determine if the config file is for the development or production build
-	path := getConfigPath()
+	// 1. Get the path of the config file
+	path := getConfigPathOp()
 
 	// 2. Open the file storing the config information that we transform
 	configurationBuffer, err := os.Open(path)
@@ -65,7 +73,7 @@ func (sc SystemConfig) LoadConfiguration() (Config, error) {
 	}
 
 	// 4. Unmarshall the byte stream to fit a go structure representation
-	err = json.Unmarshal(byteStream, sc)
+	err = json.Unmarshal(byteStream, &sc)
 	if err != nil {
 		l4g.Error("unable to unmarshall byte stream into data state structure %s", err.Error())
 		return SystemConfig{}, err
@@ -73,16 +81,4 @@ func (sc SystemConfig) LoadConfiguration() (Config, error) {
 
 	// 5. nil for no error
 	return sc, nil
-}
-
-func getConfigPath() string {
-	// 1. Determine whether the environment is local or production
-	env := os.Getenv("LOCAL")
-
-	// 2. Given the run time environment, determine the path which stores the config information
-	if env == "1" {
-		return os.Getenv(localEnvironmentPath)
-	}
-	return os.Getenv(productionEnvironmentPath)
-
 }

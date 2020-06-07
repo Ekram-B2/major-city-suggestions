@@ -1,7 +1,7 @@
 {
-    "env": "dev",
-    "port": 8080, 
-    "isfile": true,
+    "datapointtype": "city", 
+    "filetype": "json",
     "isjson": true,
-    "filepath": "data/ca.json"
+    "minimalkeyset": ["city", "country", "is02", "lng", "lat"],
+    "chardistancecalculator": "levenstein"
 }

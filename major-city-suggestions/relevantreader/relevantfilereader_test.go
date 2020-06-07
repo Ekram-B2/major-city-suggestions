@@ -25,7 +25,7 @@ func Test_relevantfilereader_NewRelevantFileReaderCreated(t *testing.T) {
 	// 5. Determine if expected state matches actual state (Assert)
 
 	if actualRR == nil {
-		t.Fatalf("failed to create a new relevant file reader")
+		t.Fatalf("failed to create a new relevant file reader; returned nil result")
 	}
 
 	if actualRR.fileType != expectedRR.fileType {
