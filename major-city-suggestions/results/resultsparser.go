@@ -15,8 +15,9 @@ type resultsParser struct {
 func NewResultsParser(dataProperties []string, dataPoint string) resultsParser {
 	return resultsParser{dataProperties: dataProperties, dataPoint: dataPoint}
 }
-func (rp resultsParser) verifyIfDataPointExists(sample interface{}, converter converter, dataPoint DataPoint) (bool, DataPoint) {
+func (rp resultsParser) verifyIfDataPoint(sample interface{}, dataPoint DataPoint, converter converter) (isDataPoint bool, dp DataPoint) {
 	// 1. Get the data point and the subset of properties found to match the minimal set defined within the config
+
 	minimalProperties, dataPoint := converter(sample, dataPoint, rp.dataProperties)
 
 	// 2. See if there are enough properties defined to complete a datapoint sufficient for the remainder of the implementation
@@ -46,12 +47,12 @@ func (rp resultsParser) ParseUnstructuredResult(dataSet map[string]interface{}, 
 	}
 
 	for _, sample := range sampleSet.([]interface{}) {
-		var datum DataPoint
-
-		isDataPoint, datum := rp.verifyIfDataPointExists(sample, converter, datum)
+		dataPoint := GetDataPoint(rp.dataPoint)
+		isDataPoint, dp := rp.verifyIfDataPoint(sample, dataPoint, converter)
 		if isDataPoint == true {
-			structuredResultsContainer.AddDataPoint(datum)
+			structuredResultsContainer = structuredResultsContainer.AddDataPoint(dp)
 		}
+
 	}
 
 	return structuredResultsContainer, true

@@ -12,15 +12,17 @@ func (c Cities) ContainsMembers() bool {
 }
 
 // CombineWith takes two results and performs a join operation
-func (c Cities) CombineWith(r Results) {
+func (c Cities) CombineWith(r Results) Results {
 	c.Members = append(c.Members, r.GetView()...)
 	c.containsMembers = true
+	return c
 }
 
 // AddDataPoint takes two results and performs a join operation
-func (c Cities) AddDataPoint(d DataPoint) {
+func (c Cities) AddDataPoint(d DataPoint) Results {
 	c.Members = append(c.Members, d)
 	c.containsMembers = true
+	return c
 }
 
 // GetView presents a view of the Results within a linear data structure

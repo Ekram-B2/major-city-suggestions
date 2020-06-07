@@ -57,7 +57,6 @@ func (sc SystemConfig) LoadConfiguration(getConfigPathOp configPathGetter) (Conf
 	configurationBuffer, err := os.Open(path)
 
 	if err != nil {
-
 		l4g.Error("unable to open the provided file: %s", err.Error())
 		return SystemConfig{}, err
 	}

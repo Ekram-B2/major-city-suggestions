@@ -5,9 +5,9 @@ type Results interface {
 	// GetView returns a generic view of the results data
 	GetView() []DataPoint
 	// Combine two sets of results
-	CombineWith(Results)
+	CombineWith(Results) Results
 	// AddDataPoint adds a new datapoint to the results
-	AddDataPoint(DataPoint)
+	AddDataPoint(DataPoint) Results
 	// ContainsMembers checks to see if there are any members in the Result set
 	ContainsMembers() bool
 }

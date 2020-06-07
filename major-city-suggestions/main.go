@@ -17,7 +17,7 @@ func main() {
 	r.Get("/suggestions", suggestions.HandleRequestForSuggestions)
 
 	// ... any extra endpoints will be set up here
-	if os.Getenv("LOCAL") == "1" {
+	if os.Getenv("DEVELOPMENT") == "1" {
 		r.Get("/", handleRootLocal) // this endpoint is written within for testing purposes
 	} else {
 		r.Get("/", handleRootProd) // this endpoint is what will be seen within the production environemnt

@@ -28,14 +28,15 @@ func getExtension(file string) string {
 
 // defaultbuildDataSetFrom is an implementation that builds a dataset from a manifest
 func defaultbuildDataSetFrom(manifest Manifest) map[string][]string {
-	var dataset map[string][]string
+	dataset := make(map[string][]string, 0)
 	// 1. From the manifest, populate the dataset
 	for _, file := range manifest.Files {
 		extension := getExtension(file)
 		if files, ok := dataset[extension]; ok {
 			files = append(files, file)
 		} else {
-			dataset[extension] = []string{file}
+			dataset[extension] = make([]string, 0)
+			dataset[extension] = append(dataset[extension], file)
 		}
 	}
 	// 2. Return populated dataset

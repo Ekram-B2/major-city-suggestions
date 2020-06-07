@@ -20,11 +20,15 @@ type responseFormat struct {
 
 func getReader(config config.Config) relevantreader.RelevantReader {
 	if config.IsRemoteClient() {
-		return relevantreader.NewRelevantFileReader(config, dataset.GetLoader(config.GetDataPointType()))
+		return relevantreader.NewRelevantFileReader(config,
+			dataset.GetDatasetBuilderOp(os.Getenv("DEFAULT_DATASET_BUILDER")),
+			dataset.LoadPersistanceFiles)
 	}
 	// This would nominally be the case where a reader would be created to support access to remote clients (e.g. sqldb) but this
-	// implementation presently doesn't support that
-	return relevantreader.NewRelevantFileReader(config, dataset.GetLoader(config.GetDataPointType()))
+	// implementation presently doesn't support that so we return the same result as the remote client for now
+	return relevantreader.NewRelevantFileReader(config,
+		dataset.GetDatasetBuilderOp(os.Getenv("DEFAULT_DATASET_BUILDER")),
+		dataset.LoadPersistanceFiles)
 
 }
 
@@ -40,7 +44,7 @@ func HandleRequestForSuggestions(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	// 2. Load in system configuration for project
-	config, err := GetConfiguration(os.Getenv("CONFIG"))
+	config, err := config.GetConfiguration(os.Getenv("CONFIG"))
 	if err != nil {
 		l4g.Error("unable to load in configuration object: %s", err.Error())
 		http.Error(rw, "there was an issue on our end; please wait for some time before trying your request again :)", http.StatusInternalServerError)
@@ -59,7 +63,7 @@ func HandleRequestForSuggestions(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	// 5. Transform the structured reset set into a list of suggestions - i.e, the form that we want to return them
-	suggestions := convertResultsIntoSugestions(structuredResults, searchTerm, results.GetLatudeForDataPoint(config.GetDataPointType()), results.GetLongitudeForDataPoint(config.GetDataPointType()))
+	suggestions := convertResultsIntoSugestions(structuredResults, searchTerm, results.GetLatitudeForDataPoint(config.GetDataPointType()), results.GetLongitudeForDataPoint(config.GetDataPointType()))
 
 	// 6. Perform a sort upon the suggestions
 	applyRelevancySorter("bubble")(suggestions)

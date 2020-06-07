@@ -7,10 +7,10 @@ import (
 
 func Test_config_getDefaultConfigPathLocal(t *testing.T) {
 	// 1. Store the value of `LOCAL` env variable (Arrange)
-	temp := os.Getenv("LOCAL")
+	temp := os.Getenv("DEVELOPMENT")
 
 	// 2. Set the value of `LOCAL` env (Arrange)
-	err := os.Setenv("LOCAL", "1")
+	err := os.Setenv("DEVELOPMENT", "1")
 	if err != nil {
 		t.Fatalf("was not able to perform the necessary step of setting the `LOCAL` env variable")
 	}

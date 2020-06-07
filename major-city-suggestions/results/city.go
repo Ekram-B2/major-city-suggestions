@@ -16,13 +16,14 @@ type city struct {
 
 // GetStateMutators() ...
 func (c city) GetStateMutators() map[string]mutator {
+
 	return map[string]mutator{"city": c.setCity,
 		"admin":            c.setAdmin,
 		"country":          c.setCountry,
 		"population":       c.setPopulation,
 		"populationProper": c.setPopulationProper,
 		"capital":          c.setCapital,
-		"ISO2":             c.setISO2,
+		"iso2":             c.setISO2,
 		"lat":              c.setLat,
 		"lng":              c.setLng}
 }
@@ -36,7 +37,7 @@ func (c city) CanBeCreatedFrom(foundProperties []string) bool {
 		switch prop {
 		case "city",
 			"country",
-			"is02",
+			"iso2",
 			"lat",
 			"lng":
 			index++

@@ -17,14 +17,14 @@ func GetConfiguration(configType string) (Config, error) {
 	switch configType {
 	case "system":
 		config := SystemConfig{}
-		loadedConfig, err := config.LoadConfiguration(getConfigPathOp(os.Getenv("CONFIG_PATH_TYPE")))
+		loadedConfig, err := config.LoadConfiguration(GetConfigPathOp(os.Getenv("CONFIG_PATH")))
 		if err != nil {
 			return config, err
 		}
 		return loadedConfig, nil
 	default:
 		config := SystemConfig{}
-		loadedConfig, err := config.LoadConfiguration(getConfigPathOp(os.Getenv("CONFIG_PATH_TYPE")))
+		loadedConfig, err := config.LoadConfiguration(GetConfigPathOp(os.Getenv("CONFIG_PATH")))
 		if err != nil {
 			return config, err
 		}

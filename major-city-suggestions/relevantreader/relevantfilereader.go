@@ -19,7 +19,7 @@ type relevantFileReader struct {
 	// this is a map of all the files that make up the dataset
 	dataset map[string][]string
 	// this is the datapoint type that is read in
-	dataPoint string
+	dataPointType string
 	// this is the minimal keyset
 	minimalKeySet []string
 }
@@ -27,19 +27,19 @@ type relevantFileReader struct {
 // NewRelevantFileReader is a constructor used to return a valid reader through which
 // valid read operations are applied. The presently supported files types made availible for
 // the reader are: `json`
-func NewRelevantFileReader(config config.Config, manifestPathGetter dataset.ManifestPathGetter, dataSetBuilder dataset.DataSetBuilder, dataloader dataset.DataLoader) *relevantFileReader {
+func NewRelevantFileReader(config config.Config, dataSetBuilder dataset.DataSetBuilder, dataloader dataset.DataLoader) *relevantFileReader {
 	// 1. Resolve case where the file type is not a supported type
 	if config.GetFileType() != "json" {
 		return nil
 	}
 	// 2. Load dataset into project
-	dataset, err := dataloader(manifestPathGetter, dataSetBuilder)
+	dataset, err := dataloader(dataSetBuilder)
 	if err != nil {
 		l4g.Error("was unable to read in persistant files from the data set")
 		return nil
 	}
 	// 3. Return a structure provisioned with a specified file type and dataset
-	return &relevantFileReader{fileType: config.GetFileType(), dataset: dataset, dataPoint: config.GetDataPointType(), minimalKeySet: config.GetMinimalKeySet()}
+	return &relevantFileReader{fileType: config.GetFileType(), dataset: dataset, dataPointType: config.GetDataPointType(), minimalKeySet: config.GetMinimalKeySet()}
 }
 
 // ReadRelevant is applied to return all terms that are deemed relevant to the search term
@@ -49,20 +49,18 @@ func (rr relevantFileReader) ReadRelevant(searchTerm string) (results.Results, e
 	unstructuredResults := rr.readAll()
 
 	// 2. Get container for structured results
-	structuredResultsFormat := results.GetStructuredResultFormat(rr.dataPoint)
+	structuredResultsFormat := results.GetStructuredResultFormat(rr.dataPointType)
 	// 3. Convert the unstructured results into structured results
-	resultsParser := results.NewResultsParser(rr.minimalKeySet, rr.dataPoint)
+	resultsParser := results.NewResultsParser(rr.minimalKeySet, rr.dataPointType)
 	for _, file := range unstructuredResults {
-		resultsForFile, wasFileParsed := resultsParser.ParseUnstructuredResult(file, results.GetExtractorForDataPoint(rr.dataPoint), results.ConvertSampleToDataPoint, rr.dataPoint)
+		resultsForFile, wasFileParsed := resultsParser.ParseUnstructuredResult(file, results.GetExtractorForDataPoint(rr.dataPointType), results.ConvertSampleToDataPoint, rr.dataPointType)
 		if wasFileParsed == true {
-			structuredResultsFormat.CombineWith(resultsForFile)
+			structuredResultsFormat = structuredResultsFormat.CombineWith(resultsForFile)
 		}
-
 	}
 
 	// 4. Filter away irrelevant items from the DataState
-	structuredResultsFormat = rr.filterForRelevantDataPoints(searchTerm, structuredResultsFormat, results.GetRelevanceDetector(rr.dataPoint))
-
+	structuredResultsFormat = rr.filterForRelevantDataPoints(searchTerm, structuredResultsFormat, results.GetRelevanceDetector(rr.dataPointType))
 	// 5. return the filtered set of results
 	return structuredResultsFormat, nil
 
@@ -126,13 +124,14 @@ func (rr relevantFileReader) readAllInFile(filePath string, unmarshallerAlgorith
 // filterForRelevantDataPoints filters entries away from from the structured inputthat are irrelevant to the search term
 func (rr relevantFileReader) filterForRelevantDataPoints(searchTerm string, resultsSet results.Results, relevanceAlgorithm results.RelevanceDetector) results.Results {
 	// 1. Create container to store the entries that are determined to be relevant
-	structuredResultsContainer := results.GetStructuredResultFormat(rr.dataPoint)
+	structuredResultsContainer := results.GetStructuredResultFormat(rr.dataPointType)
 	// 2. Apply algorithm on each entry and if deemed relevant, add it to the relevant entry container
 	for _, dataSample := range resultsSet.GetView() {
 		if relevanceAlgorithm(searchTerm, dataSample) {
-			structuredResultsContainer.AddDataPoint(dataSample)
+			structuredResultsContainer = structuredResultsContainer.AddDataPoint(dataSample)
 		}
 	}
+
 	// 3. Return the modified data state
 	return structuredResultsContainer
 

@@ -12,21 +12,22 @@ type converter func(interface{}, DataPoint, []string) ([]string, DataPoint)
 // ConvertSampleToDataPoint is an implementation that converts a sanmple to a datapoint if possible
 func ConvertSampleToDataPoint(sample interface{}, dataPoint DataPoint, dataProperties []string) ([]string, DataPoint) {
 	// 1. Get the state mutator
-	stateMutator := dataPoint.GetStateMutators()
 
 	// 2. Set up deferred function to handle cases of panic
 	defer func() {
 		if r := recover(); r != nil {
-			l4g.Error(fmt.Sprintf("Formatting for file does not match the expectations of the parser"))
+			l4g.Error(fmt.Sprintf("formatting for the sample does not match the expectations of the parser"))
 		}
 	}()
-
 	// 3. Parse through the unstructured sample to see if any properties match with what we expect
-	var minimalProperties []string
-	for key, value := range sample.(map[string]string) {
+	minimalProperties := make([]string, 0)
+
+	for key, value := range sample.(map[string]interface{}) {
 		if isAMember(key, dataProperties) {
 			minimalProperties = append(minimalProperties, key)
-			stateMutator[key](value)
+			value := value.(string)
+			stateMutator := dataPoint.GetStateMutators()
+			dataPoint = stateMutator[key](value)
 		}
 	}
 	return minimalProperties, dataPoint

@@ -2,6 +2,6 @@
     "datapointtype": "city", 
     "filetype": "json",
     "isremoteclient": true,
-    "minimalkeyset": ["city", "country", "is02", "lng", "lat"],
+    "minimalkeyset": ["city", "country", "iso2", "lng", "lat"],
     "chardistancecalculator": "levenstein"
 }

@@ -1,6 +1,8 @@
 package results
 
-import "errors"
+import (
+	"errors"
+)
 
 // extractor are operations applied to get the parts of the dataset corresponding to the relevant datapoint
 type extractor func(map[string]interface{}) (interface{}, error)
@@ -9,7 +11,7 @@ type extractor func(map[string]interface{}) (interface{}, error)
 func GetCitySetFromDataset(dataSet map[string]interface{}) (interface{}, error) {
 	var empty interface{}
 
-	if _, ok := dataSet["cities"]; !ok {
+	if _, ok := dataSet["cities"]; ok {
 		return dataSet["cities"], nil
 	}
 

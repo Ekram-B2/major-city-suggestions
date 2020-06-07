@@ -1,6 +1,8 @@
 package results
 
-import "strings"
+import (
+	"strings"
+)
 
 // RelevanceDetector is applied to define functions which detect whether a term is relevant
 type RelevanceDetector func(string, DataPoint) bool
