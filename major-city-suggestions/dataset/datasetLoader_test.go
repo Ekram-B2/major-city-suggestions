@@ -9,7 +9,7 @@ func testManifestGetter() string {
 	return "dataset/manifest/manifest.test.go"
 }
 
-func testDataSetBuilder(manifest manifest) map[string][]string {
+func testDataSetBuilder(manifest Manifest) map[string][]string {
 	return map[string][]string{"json": []string{"files/json/ca.json"}}
 }
 
@@ -20,7 +20,7 @@ func Test_dataset_LoadPersistanceFiles(t *testing.T) {
 	expectedDataSet := map[string][]string{"json": []string{"files/json/ca.json"}}
 
 	// 3. Define arugments for the test (Act)
-	manifest := manifest{Files: []string{"files/json/ca.json"}}
+	manifest := Manifest{Files: []string{"files/json/ca.json"}}
 
 	// 4. Perform operation (Act)
 	actualDataSet := defaultbuildDataSetFrom(manifest)

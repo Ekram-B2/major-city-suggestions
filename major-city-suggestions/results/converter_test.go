@@ -6,12 +6,12 @@ func Test_results_ConvertSampleToDataPoint(t *testing.T) {
 	// 1. Nothing to init to set up test (Arrange)
 
 	// 2. Define expected output (Act)
-	expectedMinimalProperties := []string{"lat"}
+	expectedMinimalProperties := []string{"lat", "lng"}
 	expectedDataPoint := city{Lat: "123", Lng: "4556"}
 
 	// 3. Define input args (Act)
 	var sample interface{}
-	sample = map[string]string{"lat": "123", "lng": "4556"}
+	sample = map[string]interface{}{"lat": "123", "lng": "4556"}
 	datapoint := city{Lat: "123", Lng: "4556"}
 	minimalProperties := []string{"lat", "lng"}
 

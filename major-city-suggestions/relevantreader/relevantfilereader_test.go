@@ -10,12 +10,8 @@ import (
 	"github.com/major-city-suggestions/major-city-suggestions/results"
 )
 
-func testDataLoader() (map[string][]string, error) {
+func testDataLoader(dataset.DataSetBuilder) (map[string][]string, error) {
 	return map[string][]string{}, nil
-}
-
-func testManifestPath() string {
-	return "relevantreader/test.json"
 }
 
 func testDataSetBuilder(dataset.Manifest) map[string][]string {
@@ -26,15 +22,14 @@ func Test_relevantfilereader_NewRelevantFileReaderCreatedWithSystemConfig(t *tes
 
 	// 2. Define valid arguments (Act)
 	validFileType := "json"
-	validDataset := map[string][]string{}
 	validDataPointType := "city"
 	config := config.SystemConfig{FileType: validFileType, DataPointType: validDataPointType}
 	// 3. Define an expected valid state (Act)
 
-	expectedRR := relevantFileReader{fileType: validFileType, dataPoint: validDataPointType}
+	expectedRR := relevantFileReader{fileType: validFileType, dataPointType: validDataPointType}
 	// 4. Compute state (Act)
 
-	actualRR := NewRelevantFileReader(config, testManifestPath, testDataSetBuilder, dataset.LoadPersistanceFiles)
+	actualRR := NewRelevantFileReader(config, testDataSetBuilder, testDataLoader)
 	// 5. Determine if expected state matches actual state (Assert)
 
 	if actualRR == nil {
@@ -60,7 +55,7 @@ func Test_relevantfilereader_NewRelevantFileReaderWasNotCreatedWithDefaultConfig
 	// Use an implementation of config
 	sc := config.SystemConfig{DataPointType: validDataPoint, FileType: invalidFileType}
 	// 3. Compute state (Act)
-	actualRR := NewRelevantFileReader(sc, testManifestPath, testDataSetBuilder, dataset.LoadPersistanceFiles)
+	actualRR := NewRelevantFileReader(sc, testDataSetBuilder, dataset.LoadPersistanceFiles)
 	// 4. Determine if computed state matches expected (Assert)
 	if actualRR != nil {
 		t.Fatalf("created a non-nil type when constructor input is not valid; actual is nil")
@@ -77,11 +72,9 @@ func Test_relevantfilereader_filterForRelevantDataPoints(t *testing.T) {
 	// algorithm accordingly
 	validFileType := "json"
 	validDataPoint := "city"
-	// use an implementation of config
-	sc := config.SystemConfig{DataPointType: validDataPoint, FileType: validFileType}
-
+	rr := relevantFileReader{dataPointType: validDataPoint, fileType: validFileType}
 	// Define valid arguments (Act)
-	relevanceAlgorithm := test_relevanceAlgorithm
+	relevanceAlgorithm := testRelevanceAlgorithm
 	searchTerm := "tor"
 	resultSet := results.Cities{}
 

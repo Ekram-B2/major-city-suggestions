@@ -114,7 +114,7 @@ func Test_config_LoadConfiguration(t *testing.T) {
 	// 2. Specify what members are to be expected
 	expectedDataPointType := "city"
 	expectedFileType := "json"
-	expectedIsRemote := false
+	expectedIsRemote := true
 	expectedMinimalkeyset := []string{"city", "country", "is02", "lng", "lat"}
 	expectedCharDistanceCalculator := "levenstein"
 

@@ -28,10 +28,10 @@ func Test_dataset_defaultbuildDataSetFrom(t *testing.T) {
 	// 1. Nothing to init to set up test (Arrange)
 
 	// 2. Define expected output (Act)
-	expectedDataSet := map[string][]string{"json": []string{"files/json/ca.json"}}
+	expectedDataSet := map[string][]string{"json": []string{"ca.json"}}
 
 	// 3. Define arugments for the test (Act)
-	manifest := manifest{Files: []string{"ca.json"}}
+	manifest := Manifest{Files: []string{"ca.json"}}
 
 	// 4. Perform operation (Act)
 	actualDataSet := defaultbuildDataSetFrom(manifest)

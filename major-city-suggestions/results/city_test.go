@@ -50,17 +50,17 @@ func Test_city_CanBeCreatedFrom(t *testing.T) {
 	}{
 		{
 			name: "Success",
-			args: args{foundProperties: []string{"city", "country", "is02", "lat", "lng"}},
+			args: args{foundProperties: []string{"city", "country", "iso2", "lat", "lng"}},
 			want: true,
 		},
 		{
 			name: "Failure",
-			args: args{foundProperties: []string{"city", "country", "is02", "lat"}},
+			args: args{foundProperties: []string{"city", "country", "iso2", "lat"}},
 			want: false,
 		},
 		{
 			name: "Mismatch",
-			args: args{foundProperties: []string{"city", "country", "is02", "lng", "lat"}},
+			args: args{foundProperties: []string{"city", "country", "iso2", "lng", "lat"}},
 			want: true,
 		},
 	}

@@ -15,7 +15,7 @@ func Test_config_getDefaultConfigPathLocal(t *testing.T) {
 		t.Fatalf("was not able to perform the necessary step of setting the `LOCAL` env variable")
 	}
 	// 3. Define the expected output from the operation (Act)
-	expectedOut := "/files/config.json"
+	expectedOut := "config/files/config.development.json"
 
 	// 4. Perform operation to render actual output (Act)
 	actualOut := getDefaultConfigPath()

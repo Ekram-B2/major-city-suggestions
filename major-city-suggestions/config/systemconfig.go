@@ -14,7 +14,7 @@ type SystemConfig struct {
 	FileType           string   `json:"filetype"`
 	IsRemote           bool     `json:"isremoteclient"`
 	MinimalKeySet      []string `json:"minimalkeyset"`
-	CharDistCalculator string   `json:"chardistcalculator"`
+	CharDistCalculator string   `json:"chardistancecalculator"`
 }
 
 // GetCharDistCalculator is applied to get the config for the distance calculator between two strings when
