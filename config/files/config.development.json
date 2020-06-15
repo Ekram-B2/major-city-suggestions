@@ -1,0 +1,20 @@
+{
+    "datapointtype": "city", 
+    "isremoteclient": false,
+    "datasetbuildertype": "default",
+    "datasetloadertype": "default",
+    "sortertype": "default",
+    "manifestpath": "dataset/files/manifest/manifest.json",
+    "cachekeytype": "default",
+    "byteencodertype": "default",
+    "bytedecodertype": "default",
+    "distancerankertype":"default",
+    "latlngdistcalctype": "default",
+    "normalizertype": "default"
+
+
+
+
+    
+   
+}

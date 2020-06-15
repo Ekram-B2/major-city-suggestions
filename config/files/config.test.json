@@ -1,0 +1,8 @@
+{
+    "datapointtype": "city", 
+    "isremoteclient": false,
+    "datasetbuildertype": "default",
+    "datasetloadertype": "default",
+    "sorterType": "default",
+    "manifestpath": "dataset/files/manifest/manifest.json"
+}

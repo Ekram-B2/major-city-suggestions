@@ -1,0 +1,13 @@
+[
+    {
+        "city": "Toronto", 
+        "admin": "Ontario", 
+        "country": "Canada", 
+        "population_proper": "3934421", 
+        "iso2": "CA", 
+        "capital": "admin", 
+        "lat": "43.666667", 
+        "lng": "-79.416667", 
+        "population": "5213000"
+    }
+]

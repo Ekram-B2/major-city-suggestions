@@ -1,0 +1,13 @@
+# Suggestions Manager
+
+A small go application built designed to support the core functionality of being
+able to support a retreival of city suggestions given a search term.
+
+The application is built in mind of being maintainble in the sense of being easy
+to makes changes to, and minimal in regards to what the composing components are
+to do. 
+
+
+The service is availible at the end point
+https://immense-journey-27252.herokuapp.com/
+

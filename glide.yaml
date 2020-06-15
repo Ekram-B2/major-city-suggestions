@@ -1,0 +1,5 @@
+package: github.com/Ekram-B2/suggestionsmanager
+import:
+- package: github.com/alecthomas/log4go
+- package: github.com/go-chi/chi
+  version: v4.1.2
