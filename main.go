@@ -52,7 +52,6 @@ func main() {
 		bindingPort = ":" + os.Getenv("PORT")
 
 	}
-	bindingPort = ":8080"
 	// 4. Start the web application process and bind the application to a port
 	http.ListenAndServe(bindingPort, r)
 }

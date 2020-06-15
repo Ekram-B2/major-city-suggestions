@@ -18,4 +18,8 @@ https://github.com/Ekram-B2/suggestionscache
 https://github.com/Ekram-B2/rankmanager
 
 
+Some of the input information was pre-processed prior to its use within the application. The notebook where this occured is found here:
+
+https://github.com/Ekram-B2/city-analyzer
+
 
