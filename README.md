@@ -11,3 +11,11 @@ to do.
 The service is availible at the end point
 https://immense-journey-27252.herokuapp.com/
 
+The application is meant to be paired with the suggestions cache application which supports caching of web requests
+made to the worker process which computes the rank, and the rank manager that computes actual rank
+
+https://github.com/Ekram-B2/suggestionscache
+https://github.com/Ekram-B2/rankmanager
+
+
+
