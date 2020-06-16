@@ -105,6 +105,7 @@ func HandleRequestForSuggestions(rw http.ResponseWriter, req *http.Request) {
 
 	// 10. Return response back to the caller
 	rw.Header().Add("Content-Type", "application/json; charset=UTF-8")
+	rw.Header().Add("Cache-Control", "max-age=604800")
 	rw.WriteHeader(http.StatusOK)
 
 	b := &bytes.Buffer{}
