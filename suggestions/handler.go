@@ -11,7 +11,6 @@ import (
 	l4g "github.com/alecthomas/log4go"
 
 	"github.com/Ekram-B2/suggestionsmanager/config"
-	"github.com/Ekram-B2/suggestionsmanager/dataset"
 	"github.com/Ekram-B2/suggestionsmanager/relevantreader"
 	"github.com/Ekram-B2/suggestionsmanager/results"
 )
@@ -22,20 +21,6 @@ var (
 
 type responseFormat struct {
 	Suggestions []Suggestion `json:"suggestions"`
-}
-
-func getReader(config config.Config) relevantreader.RelevantReader {
-	if !config.IsRemote {
-		return relevantreader.NewRelevantFileReader(config,
-			dataset.GetDatasetBuilder(config.DataSetBuildType),
-			dataset.GetDataSetLoader(config.DataSetLoaderType))
-	}
-	// This would nominally be the case where a reader would be created to support access to remote clients (e.g. sqldb) but this
-	// implementation presently doesn't support that so we return the same result as the local client for now
-	return relevantreader.NewRelevantFileReader(config,
-		dataset.GetDatasetBuilder(config.DataSetBuildType),
-		dataset.GetDataSetLoader(config.DataSetLoaderType))
-
 }
 
 // HandleRequestForSuggestions handles the logic used to build the list of suggestions to return back the the caller
@@ -79,7 +64,7 @@ func HandleRequestForSuggestions(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 	// 5. Create a reader to apply for reading in structured data
-	reader := getReader(config)
+	reader := relevantreader.GetReader(config)
 
 	// 6. Read in a set of structured results from the data source
 	structuredResults, err := reader.ReadRelevant(searchTerm)
@@ -101,7 +86,13 @@ func HandleRequestForSuggestions(rw http.ResponseWriter, req *http.Request) {
 	applyRelevancySorter(config.SorterType)(suggestions)
 
 	// 9. Set up a formatted response to be returned back to the caller
-	responseContent := responseFormat{Suggestions: suggestions}
+	var responseContent responseFormat
+	if len(suggestions) == noSuggestionsFound {
+		responseContent = responseFormat{Suggestions: make([]Suggestion, 0)}
+
+	} else {
+		responseContent = responseFormat{Suggestions: suggestions}
+	}
 
 	// 10. Return response back to the caller
 	rw.Header().Add("Content-Type", "application/json; charset=UTF-8")

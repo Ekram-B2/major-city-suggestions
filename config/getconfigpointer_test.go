@@ -6,13 +6,13 @@ import (
 )
 
 func Test_config_getDefaultConfigPathLocal(t *testing.T) {
-	// 1. Store the value of `SYSTEM_BUILD` env variable (Arrange)
-	temp := os.Getenv("SYSTEM_BUILD")
+	// 1. Store the value of `DEPLOYMENT_TYPE` env variable (Arrange)
+	temp := os.Getenv("DEPLOYMENT_TYPE")
 
-	// 2. Set the value of `SYSTEM_BUILD` env (Arrange)
-	err := os.Setenv("SYSTEM_BUILD", "1")
+	// 2. Set the value of `DEPLOYMENT_TYPE` env (Arrange)
+	err := os.Setenv("DEPLOYMENT_TYPE", "1")
 	if err != nil {
-		t.Fatalf("was not able to perform the necessary step of setting the `SYSTEM_BUILD` env variable")
+		t.Fatalf("was not able to perform the necessary step of setting the `DEPLOYMENT_TYPE` env variable")
 	}
 	// 3. Define the expected output from the operation (Act)
 	expectedOut := "config/files/config.development.json"

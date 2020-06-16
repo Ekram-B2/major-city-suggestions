@@ -1,6 +1,7 @@
 {
     "datapointtype": "city", 
     "isremoteclient": false,
+    "readertype": "json",
     "datasetbuildertype": "default",
     "datasetloadertype": "default",
     "sortertype": "default",

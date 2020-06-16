@@ -4,6 +4,7 @@ package config
 type Config struct {
 	DataPointType      string `json:"datapointtype"`
 	IsRemote           bool   `json:"isremoteclient"`
+	ReaderType         string `json:"readertype"`
 	DataSetBuildType   string `json:"datasetbuildertype"`
 	DataSetLoaderType  string `json:"datasetloadertype"`
 	SorterType         string `json:"sortertype"`

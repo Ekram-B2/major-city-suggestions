@@ -27,3 +27,11 @@ type RelevantReader interface {
 RelevantReader supports reading relevant data from a persistant store. Relevant
 data is partial segment of the global data set with which a rank can be
 attributed
+
+#### func  GetReader
+
+```go
+func GetReader(config config.Config) RelevantReader
+```
+GetReader is a factory applied to get a relevant reader based on the
+configuraion options
