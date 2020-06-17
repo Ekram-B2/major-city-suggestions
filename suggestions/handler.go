@@ -40,17 +40,6 @@ func HandleRequestForSuggestions(rw http.ResponseWriter, req *http.Request) {
 	searchTermLng := req.URL.Query().Get("longitude")
 
 	// 3. Parse to make sure lat and long input are properly formatted and are latitudes and longitudes
-	if strings.Contains(searchTermLat, "%20") {
-		l4g.Error("SYSTEM-ERROR: invalid parameter 'latitude' provided")
-		http.Error(rw, "There was an error processing one of the passed parameters. If you will provide a 'latitude', please provide one in the range [-90,90].", http.StatusBadRequest)
-		return
-	}
-
-	if strings.Contains(searchTermLng, "%20") {
-		l4g.Error("SYSTEM-ERROR: invalid parameter 'longitude' provided")
-		http.Error(rw, "There was an error retreiving one of the required query parameters. If you will provide a 'longitude', please provide one in the range [-180,180]", http.StatusBadRequest)
-		return
-	}
 
 	isFormattedWell := verifyLatLongIsWellFormatted(searchTermLat, searchTermLng, rw)
 	if isFormattedWell != true {
