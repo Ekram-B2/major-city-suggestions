@@ -22,4 +22,5 @@ Some of the input information was pre-processed prior to its use within the appl
 
 https://github.com/Ekram-B2/city-analyzer
 
-
+## Some ppt-based documentation at this link
+https://docs.google.com/presentation/d/1L7p765psb04aYH2YSh1L9fgi0wBvm8TFmP_nxC-TpRk/edit?usp=sharing
